@@ -1,14 +1,16 @@
 ---
-
+import Layout from '../layouts/Layout.astro'
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body> </body>
-</html>
+<Layout PAGE_TITLE="My Weekly Sight Words">
+	<section class="space-y-9 text-center">
+		<h1 class="text-5xl leading-normal">
+			<span class="text-3xl">Welcome to</span>
+			<span class="block font-bold">My Weekly Sight Words!</span>
+		</h1>
+		<p class="text-balance text-xl">
+			This website is designed to help your child learn their weekly important sight words they'll see often when reading.
+		</p>
+		<p><a href="/menu" class="rounded-lg bg-green-700 px-4 py-2 text-xl text-white hover:bg-green-800">Let's Start Learning!</a></p>
+	</section>
+</Layout>

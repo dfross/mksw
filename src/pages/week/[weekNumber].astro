@@ -1,0 +1,22 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import Flashcard from '../../components/Flashcard.vue'
+import wordsData from '../../data/words.json'
+
+export function getStaticPaths() {
+	return wordsData.weeks.map((week) => ({
+		params: { weekNumber: week.weekNumber.toString() },
+		props: { weekWords: week.words },
+	}))
+}
+
+const { weekNumber } = Astro.params
+const { weekWords } = Astro.props
+---
+
+<Layout PAGE_TITLE={`Week ${weekNumber} Sight Words`}>
+	<section class="text-center">
+		<h1 class="mb-9 text-3xl font-bold">Week {weekNumber} Sight Words</h1>
+		<Flashcard words={weekWords} client:load />
+	</section>
+</Layout>

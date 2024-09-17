@@ -1,0 +1,16 @@
+{
+	"weeks": [
+		{
+			"weekNumber": 1,
+			"words": ["the", "and", "a", "to", "said"]
+		},
+		{
+			"weekNumber": 2,
+			"words": ["in", "he", "was", "that", "she"]
+		},
+		{
+			"weekNumber": 3,
+			"words": ["on", "they", "but", "at", "with"]
+		}
+	]
+}

@@ -1,0 +1,21 @@
+---
+import Layout from '../layouts/Layout.astro'
+import words from '../data/words.json'
+---
+
+<Layout PAGE_TITLE="Weekly Word Sets">
+	<section class="space-y-9 text-center">
+		<h1 class="text-3xl font-bold">Choose a Weekly Word Set</h1>
+		<ul class="space-y-3">
+			{
+				words.weeks.map((week) => (
+					<li>
+						<a href={`/week/${week.weekNumber}`} class="block rounded-lg bg-green-700 px-4 py-2 text-xl text-white hover:bg-green-800">
+							Week {week.weekNumber}
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</section>
+</Layout>

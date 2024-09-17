@@ -1,0 +1,46 @@
+---
+import { ViewTransitions } from 'astro:transitions'
+import { AstroFont } from 'astro-font'
+import { SITE_TITLE, SITE_DESCRIPTION } from '../constants'
+const { PAGE_TITLE = 'Home' } = Astro.props
+
+interface Props {
+	PAGE_TITLE: string
+}
+---
+
+<!doctype html>
+<html lang="en" class="h-full">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="description" content={SITE_DESCRIPTION} />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<AstroFont
+			config={[
+				{
+					src: [],
+					name: 'IBM Plex Sans',
+					googleFontsURL: 'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@200;400;700&display=swap',
+					preload: true,
+					display: 'swap',
+					selector: 'body',
+					fallback: 'sans-serif',
+				},
+			]}
+		/>
+		<title>{SITE_TITLE} - {PAGE_TITLE}</title>
+		<ViewTransitions />
+	</head>
+	<body class="mx-auto flex h-full max-w-screen-md flex-col bg-neutral-900 p-9 pb-0 text-neutral-200">
+		<main class="flex h-full flex-grow flex-col justify-center">
+			<slot />
+		</main>
+		<footer>
+			<p class="text-balance py-9 text-center text-sm tracking-wide text-neutral-400 md:text-pretty">
+				&copy; 2024 My Weekly Sight Words. All rights reserved.
+			</p>
+		</footer>
+	</body>
+</html>
