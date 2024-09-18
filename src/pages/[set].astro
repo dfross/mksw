@@ -1,0 +1,26 @@
+---
+import Layout from '../layouts/Layout.astro'
+import Flashcard from '../components/Flashcard.vue'
+import wordsData from '../data/words.json'
+import { BRAND_NAME } from '../constants'
+
+export function getStaticPaths() {
+	return wordsData.weeks.map((week) => ({
+		params: { set: week.set },
+		props: { weekWords: week.words },
+	}))
+}
+
+const { set } = Astro.params
+const { weekWords } = Astro.props
+---
+
+<Layout PAGE_TITLE={`Set ${set} Sight Words`}>
+	<section class="text-center">
+		<h2 class="visually-hidden">{BRAND_NAME}</h2>
+		<nav class="text-xl">
+			<a href="/" class="underline opacity-60 hover:opacity-100">Home</a> / {set}
+		</nav>
+		<Flashcard words={weekWords} set={set} client:load />
+	</section>
+</Layout>

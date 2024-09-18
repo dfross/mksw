@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 
-const props = defineProps(['words'])
+const props = defineProps(['words', 'set'])
 const currentIndex = ref(0)
 
 const nextWord = () => {
@@ -16,11 +16,18 @@ const previousWord = () => {
 	}
 }
 
+const selectRandomWord = () => {
+	const randomIndex = Math.floor(Math.random() * props.words.length)
+	currentIndex.value = randomIndex
+}
+
 const handleKeydown = (event) => {
-	if (event.key === 'ArrowRight') {
+	if (event.key === 'ArrowRight' || event.code === 'Space') {
 		nextWord()
 	} else if (event.key === 'ArrowLeft') {
 		previousWord()
+	} else if (event.key === 'r' || event.key === 'R') {
+		selectRandomWord()
 	}
 }
 
@@ -34,23 +41,19 @@ onUnmounted(() => {
 </script>
 
 <template>
-	<div class="flex flex-col items-center">
-		<div class="mb-9 flex aspect-video w-2/3 items-center justify-center rounded-lg bg-white text-purple-800 shadow-lg">
-			<h2 class="text-8xl font-bold">{{ words[currentIndex] }}</h2>
+	<div class="flex flex-col items-center py-9">
+		<div
+			class="relative mb-9 flex aspect-video w-full items-center justify-center rounded-lg bg-gradient-to-b from-cyan-100 to-blue-100 text-blue-900 shadow-2xl"
+			role="region"
+			aria-label="Flashcard">
+			<h2 class="text-9xl font-bold drop-shadow-lg" aria-live="polite">{{ words[currentIndex] }}</h2>
+			<small class="absolute bottom-3 right-3" aria-live="polite">{{ currentIndex + 1 }}/{{ words.length }}</small>
 		</div>
-		<div class="flex space-x-6">
-			<button
-				@click="previousWord"
-				class="min-w-36 rounded-lg bg-blue-500 px-4 py-2 text-xl text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
-				:disabled="currentIndex === 0">
-				Previous
-			</button>
-			<button
-				@click="nextWord"
-				class="min-w-36 rounded-lg bg-green-700 px-4 py-2 text-xl text-white hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-600"
-				:disabled="currentIndex === words.length - 1">
-				Next
-			</button>
+		<div class="flex w-full justify-center gap-3">
+			<button class="button" @click="previousWord" :disabled="currentIndex === 0" aria-label="Previous word">Previous</button>
+			<button class="button" @click="selectRandomWord" aria-label="Random word">Random</button>
+
+			<button class="button" @click="nextWord" :disabled="currentIndex === words.length - 1" aria-label="Next word">Next</button>
 		</div>
 	</div>
 </template>

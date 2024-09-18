@@ -1,16 +1,33 @@
 ---
 import Layout from '../layouts/Layout.astro'
+import words from '../data/words.json'
+import { BRAND_NAME } from '../constants'
 ---
 
 <Layout PAGE_TITLE="My Weekly Sight Words">
 	<section class="space-y-9 text-center">
-		<h1 class="text-5xl leading-normal">
+		<h1 class="text-5xl leading-tight">
 			<span class="text-3xl">Welcome to</span>
-			<span class="block font-bold">My Weekly Sight Words!</span>
+			<span class="block font-bold" aria-label="My Weekly Sight Words">{BRAND_NAME}</span>
 		</h1>
-		<p class="text-balance text-xl">
-			This website is designed to help your child learn their weekly important sight words they'll see often when reading.
+		<p class="mx-auto text-balance md:w-3/4">
+			<b>LCISD High-Frequency Word List:</b> K.2B(iv) The student will demonstrate and apply phonetic knkowledge by identifying and reading at
+			least 25 high-frequency words from a research-based list.
 		</p>
-		<p><a href="/menu" class="rounded-lg bg-green-700 px-4 py-2 text-xl text-white hover:bg-green-800">Let's Start Learning!</a></p>
+		<ul class="mx-auto space-y-3 md:w-1/2 md:min-w-fit" role="list">
+			{
+				words.weeks.map((week) => (
+					<li>
+						<a
+							href={`/${week.set}`}
+							class="button flex min-w-full items-center justify-around gap-4"
+							aria-label={`${week.set} - ${week.words.length} words`}>
+							<span>{week.set}</span>
+							<span class="rounded-full bg-blue-900 px-3 py-1 text-sm font-bold text-blue-100">{week.words.length} Words</span>
+						</a>
+					</li>
+				))
+			}
+		</ul>
 	</section>
 </Layout>
