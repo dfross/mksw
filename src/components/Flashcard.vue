@@ -267,7 +267,7 @@ const listenForWord = async () => {
 <template>
 	<div class="flex flex-col items-center pt-9">
 		<div
-			class="relative mb-9 flex h-[50vh] max-h-[500px] w-full cursor-pointer items-center justify-center rounded-lg bg-gradient-to-b from-cyan-100 to-blue-100 text-blue-900 shadow-2xl"
+			class="relative mb-9 flex h-[33vh] max-h-[500px] w-full cursor-pointer items-center justify-center rounded-lg bg-gradient-to-b from-cyan-100 to-blue-100 text-blue-900 shadow-2xl sm:h-[50vh]"
 			role="region"
 			aria-label="Flashcard"
 			@click="listenForWord">
