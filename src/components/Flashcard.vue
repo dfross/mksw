@@ -77,9 +77,13 @@ const cleanup = () => {
 }
 
 const handleVisibilityChange = () => {
-	if (document.hidden) {
+	if (document.hidden || document.visibilityState === 'hidden') {
 		cleanup()
 	}
+}
+
+const handleWindowBlur = () => {
+	cleanup()
 }
 
 const handlePageHide = () => {
@@ -96,6 +100,7 @@ onMounted(() => {
 	window.addEventListener('keydown', handleKeydown)
 	window.addEventListener('setFlashcardWord', handleSetFlashcardWord)
 	document.addEventListener('visibilitychange', handleVisibilityChange)
+	window.addEventListener('blur', handleWindowBlur)
 	window.addEventListener('pagehide', handlePageHide)
 })
 
@@ -103,6 +108,7 @@ onUnmounted(() => {
 	window.removeEventListener('keydown', handleKeydown)
 	window.removeEventListener('setFlashcardWord', handleSetFlashcardWord)
 	document.removeEventListener('visibilitychange', handleVisibilityChange)
+	window.removeEventListener('blur', handleWindowBlur)
 	window.removeEventListener('pagehide', handlePageHide)
 	cleanup()
 })
