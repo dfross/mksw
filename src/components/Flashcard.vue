@@ -165,49 +165,57 @@ const listenForWord = async () => {
 			aria-label="Flashcard"
 			@click="listenForWord">
 			<h2 class="text-7xl font-bold drop-shadow-md md:text-9xl" aria-live="polite">{{ words[currentIndex] }}</h2>
+			<div
+				v-if="feedback"
+				class="absolute bottom-3 rounded-full border px-4 py-2 text-lg font-semibold"
+				:class="{
+					'border-green-300 bg-green-100 text-green-700': feedback.includes('Correct'),
+					'border-red-300 bg-red-100 text-red-700': feedback.includes('Not quite'),
+				}">
+				{{ feedback }}
+			</div>
 			<small class="absolute bottom-3 right-3" aria-live="polite">{{ currentIndex + 1 }}/{{ words.length }}</small>
 			<div v-if="isListening" class="absolute right-3 top-3">
 				<microphone-icon :class="{ 'animate-pulse': isListening }" />
 			</div>
 		</div>
-		<div
-			v-if="feedback"
-			class="mb-4 text-lg font-semibold"
-			:class="{ 'text-green-600': feedback.includes('Correct'), 'text-red-600': feedback.includes('Not quite') }">
-			{{ feedback }}
-		</div>
-		<div class="flex w-full justify-center gap-3">
-			<button class="button button-iconleft" @click="previousWord" :disabled="currentIndex === 0" aria-label="Previous word">
-				<chevron-left-icon />
-				Prev
-			</button>
-			<button class="button button-icononly" @click="selectRandomWord" aria-label="Random word"><shuffle-icon /></button>
-			<button
-				class="button button-icononly"
-				@click="speakWord"
-				:disabled="!speechSupported || isSpeaking"
-				:aria-label="isSpeaking ? 'Speaking...' : 'Read word aloud'">
-				<volume-high-icon :class="{ 'opacity-50': isSpeaking }" />
-			</button>
-			<button
-				class="button button-icononly"
-				@click="listenForWord"
-				:disabled="!recognitionSupported || !microphoneAvailable || isListening"
-				:aria-label="
-					!recognitionSupported
-						? 'Speech recognition not supported'
-						: !microphoneAvailable
-							? 'Microphone not available'
-							: isListening
-								? 'Listening...'
-								: 'Listen for pronunciation'
-				">
-				<microphone-icon :class="{ 'animate-pulse': isListening, 'opacity-50': !recognitionSupported || !microphoneAvailable }" />
-			</button>
-			<button class="button button-iconright" @click="nextWord" :disabled="currentIndex === words.length - 1" aria-label="Next word">
-				Next
-				<chevron-right-icon />
-			</button>
+
+		<div class="flex w-full flex-col items-center justify-between gap-2 sm:flex-row">
+			<div class="flex gap-2">
+				<button class="button button-iconleft" @click="previousWord" :disabled="currentIndex === 0" aria-label="Previous word">
+					<chevron-left-icon />
+					Prev
+				</button>
+				<button class="button button-icononly" @click="selectRandomWord" aria-label="Random word"><shuffle-icon /></button>
+				<button class="button button-iconright" @click="nextWord" :disabled="currentIndex === words.length - 1" aria-label="Next word">
+					Next
+					<chevron-right-icon />
+				</button>
+			</div>
+			<div class="flex gap-2">
+				<button
+					class="button button-icononly"
+					@click="speakWord"
+					:disabled="!speechSupported || isSpeaking"
+					:aria-label="isSpeaking ? 'Speaking...' : 'Read word aloud'">
+					<volume-high-icon :class="{ 'opacity-50': isSpeaking }" />
+				</button>
+				<button
+					class="button button-icononly"
+					@click="listenForWord"
+					:disabled="!recognitionSupported || !microphoneAvailable || isListening"
+					:aria-label="
+						!recognitionSupported
+							? 'Speech recognition not supported'
+							: !microphoneAvailable
+								? 'Microphone not available'
+								: isListening
+									? 'Listening...'
+									: 'Listen for pronunciation'
+					">
+					<microphone-icon :class="{ 'animate-pulse': isListening, 'opacity-50': !recognitionSupported || !microphoneAvailable }" />
+				</button>
+			</div>
 		</div>
 	</div>
 </template>
