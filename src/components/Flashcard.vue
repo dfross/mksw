@@ -18,15 +18,19 @@ const microphoneAvailable = ref(false)
 const feedback = ref('')
 
 let recognition
+let microphoneStream = null
+let cleanupInterval
+let listenTimeout
 
 const initializeSpeechRecognition = () => {
 	if (recognitionSupported.value) {
 		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
 		recognition = new SpeechRecognition()
 		recognition.continuous = false
-		recognition.interimResults = true
+		recognition.interimResults = false
 
 		recognition.onresult = (event) => {
+			console.log('Speech recognition result received')
 			const last = event.results.length - 1
 			const result = event.results[last][0].transcript.trim().toLowerCase()
 			const currentWord = props.words[currentIndex.value].toLowerCase()
@@ -36,12 +40,21 @@ const initializeSpeechRecognition = () => {
 			} else {
 				feedback.value = `Not quite. The word is "${currentWord}". You said "${result}".`
 			}
+			isListening.value = false
+			stopMicrophone()
 		}
 
 		recognition.onerror = (event) => {
 			console.error('Speech recognition error:', event.error)
+			isListening.value = false
 			feedback.value = "Sorry, I couldn't hear you. Please try again."
-			stopListening()
+			stopMicrophone()
+		}
+
+		recognition.onend = () => {
+			console.log('Speech recognition ended')
+			isListening.value = false
+			stopMicrophone()
 		}
 	}
 }
@@ -59,13 +72,36 @@ const checkMicrophonePermission = async () => {
 }
 
 const cleanup = () => {
-	stopListening()
+	stopMicrophone()
+	if (recognition) {
+		recognition.abort()
+	}
+	if (listenTimeout) {
+		clearTimeout(listenTimeout)
+	}
 }
 
 const handleVisibilityChange = () => {
 	if (document.hidden || document.visibilityState === 'hidden') {
-		cleanup()
+		// Check if the browser is running on iOS
+		const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
+
+		if (isIOS && document.visibilityState === 'hidden') {
+			// The browser is running as a background task on iOS
+			cleanup()
+		} else {
+			// Handle other visibility change scenarios
+			cleanup()
+		}
 	}
+}
+
+const handleWindowBlur = () => {
+	cleanup()
+}
+
+const handlePageHide = () => {
+	cleanup()
 }
 
 onMounted(() => {
@@ -78,35 +114,43 @@ onMounted(() => {
 	window.addEventListener('keydown', handleKeydown)
 	window.addEventListener('setFlashcardWord', handleSetFlashcardWord)
 	document.addEventListener('visibilitychange', handleVisibilityChange)
+	window.addEventListener('blur', handleWindowBlur)
+	window.addEventListener('pagehide', handlePageHide)
+
+	cleanupInterval = setInterval(() => {
+		if (!document.hasFocus()) {
+			cleanup()
+		}
+	}, 1000) // Check every second
 })
 
 onUnmounted(() => {
 	window.removeEventListener('keydown', handleKeydown)
 	window.removeEventListener('setFlashcardWord', handleSetFlashcardWord)
 	document.removeEventListener('visibilitychange', handleVisibilityChange)
+	window.removeEventListener('blur', handleWindowBlur)
+	window.removeEventListener('pagehide', handlePageHide)
+	clearInterval(cleanupInterval)
 	cleanup()
 })
 
-const startListening = async () => {
-	if (!recognitionSupported.value) {
-		alert('Speech recognition is not supported in your browser.')
-		return
-	}
-
+const startMicrophone = async () => {
 	try {
-		await navigator.mediaDevices.getUserMedia({ audio: true })
-		feedback.value = ''
-		isListening.value = true
-		recognition.start()
+		microphoneStream = await navigator.mediaDevices.getUserMedia({ audio: true })
+		microphoneAvailable.value = true
 	} catch (err) {
-		console.error('Error accessing microphone:', err)
-		alert('Unable to access the microphone. Please check your microphone settings and try again.')
+		console.error('Microphone not available:', err)
+		microphoneAvailable.value = false
 	}
 }
 
-const stopListening = () => {
-	if (recognition) {
-		recognition.stop()
+const stopMicrophone = () => {
+	if (microphoneStream) {
+		microphoneStream.getTracks().forEach((track) => {
+			track.stop()
+			microphoneStream.removeTrack(track)
+		})
+		microphoneStream = null
 	}
 	isListening.value = false
 }
@@ -114,6 +158,7 @@ const stopListening = () => {
 watch(currentIndex, (newIndex) => {
 	feedback.value = ''
 	emit('wordChanged', newIndex)
+	stopMicrophone()
 })
 
 const nextWord = () => {
@@ -175,18 +220,61 @@ const speakWord = () => {
 
 	window.speechSynthesis.speak(utterance)
 }
+
+const resetRecognition = () => {
+	if (recognition) {
+		recognition.onresult = null
+		recognition.onerror = null
+		recognition.onend = null
+		recognition = null
+	}
+	initializeSpeechRecognition()
+}
+
+const listenForWord = async () => {
+	console.log('Attempting to listen for word...')
+	if (!recognitionSupported.value) {
+		alert('Speech recognition is not supported in your browser.')
+		return
+	}
+
+	try {
+		await startMicrophone()
+		if (!microphoneAvailable.value) {
+			alert('No microphone detected or microphone access is denied.')
+			return
+		}
+
+		feedback.value = ''
+		isListening.value = true
+		resetRecognition() // Reset recognition before starting
+		recognition.start()
+
+		// Stop listening after 10 seconds if no result is received
+		listenTimeout = setTimeout(() => {
+			if (isListening.value) {
+				cleanup()
+				feedback.value = 'Listening timed out. Please try again.'
+			}
+		}, 10000)
+	} catch (err) {
+		console.error('Error accessing microphone:', err)
+		alert('Unable to access the microphone. Please check your microphone settings and try again.')
+	}
+}
 </script>
 
 <template>
 	<div class="flex flex-col items-center pt-9">
 		<div
-			class="relative mb-9 flex h-[33vh] max-h-[500px] w-full cursor-pointer items-center justify-center rounded-lg bg-gradient-to-b from-cyan-100 to-blue-100 text-blue-900 shadow-2xl sm:h-[50vh]"
+			class="relative mb-9 flex h-[30vh] w-full cursor-pointer items-center justify-center rounded-lg bg-gradient-to-b from-cyan-100 to-blue-100 text-blue-900 shadow-2xl sm:h-[50vh]"
 			role="region"
-			aria-label="Flashcard">
+			aria-label="Flashcard"
+			@click="listenForWord">
 			<h2 class="text-7xl font-bold drop-shadow-md md:text-9xl" aria-live="polite">{{ words[currentIndex] }}</h2>
 			<div
 				v-if="feedback"
-				class="absolute bottom-3 rounded-full border px-4 py-2 font-semibold"
+				class="absolute bottom-3 rounded-full border px-4 py-2 text-lg font-semibold"
 				:class="{
 					'border-green-300 bg-green-100 text-green-700': feedback.includes('Correct'),
 					'border-red-300 bg-red-100 text-red-700': feedback.includes('Not quite'),
@@ -221,12 +309,8 @@ const speakWord = () => {
 				</button>
 				<button
 					class="button button-icononly"
-					@mousedown="startListening"
-					@mouseup="stopListening"
-					@mouseleave="stopListening"
-					@touchstart.prevent="startListening"
-					@touchend.prevent="stopListening"
-					:disabled="!recognitionSupported || !microphoneAvailable"
+					@click="listenForWord"
+					:disabled="!recognitionSupported || !microphoneAvailable || isListening"
 					:aria-label="
 						!recognitionSupported
 							? 'Speech recognition not supported'
@@ -234,7 +318,7 @@ const speakWord = () => {
 								? 'Microphone not available'
 								: isListening
 									? 'Listening...'
-									: 'Press and hold to listen'
+									: 'Listen for pronunciation'
 					">
 					<microphone-icon :class="{ 'animate-pulse': isListening, 'opacity-50': !recognitionSupported || !microphoneAvailable }" />
 				</button>
