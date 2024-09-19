@@ -1,0 +1,1 @@
+import"./hoisted.BB6uRyKX.js";document.addEventListener("astro:page-load",()=>{const e=document.getElementById("wordSelector");e?e.addEventListener("change",n=>{const o=n.target,t=parseInt(o.value);isNaN(t)||window.dispatchEvent(new CustomEvent("setFlashcardWord",{detail:{index:t}}))}):console.error("Word selector element not found")});

@@ -3,6 +3,7 @@ import tailwind from '@astrojs/tailwind'
 import vue from '@astrojs/vue'
 import sitemap from '@astrojs/sitemap'
 import partytown from '@astrojs/partytown'
+import icon from 'astro-icon'
 export default defineConfig({
 	site: 'https://mksw.netlify.app',
 	integrations: [
@@ -14,5 +15,6 @@ export default defineConfig({
 				forward: ['dataLayer.push'],
 			},
 		}),
+		icon(),
 	],
 })

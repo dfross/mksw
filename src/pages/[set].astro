@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro'
 import Flashcard from '../components/Flashcard.vue'
 import wordsData from '../data/words.json'
 import { BRAND_NAME } from '../constants'
+import { Image } from 'astro:assets'
 
 export function getStaticPaths() {
 	return wordsData.weeks.map((week) => ({
@@ -18,9 +19,37 @@ const { weekWords } = Astro.props
 <Layout PAGE_TITLE={`Set ${set} Sight Words`}>
 	<section class="text-center">
 		<h2 class="visually-hidden">{BRAND_NAME}</h2>
-		<nav class="text-xl">
-			<a href="/" class="underline opacity-60 hover:opacity-100">Home</a> / {set}
+		<nav class="flex items-center justify-between">
+			<section class="flex items-center gap-2 text-xl text-blue-100">
+				<a href="/" class="flex items-center border-b-2 border-b-white/60 hover:border-b-white focus:border-b-white">
+					<Image src="/Home.svg" alt="Return Home" height="24" width="24" class="mr-1" />Home
+				</a>
+				<Image src="/ChevronRight.svg" alt="" height="16" width="16" />
+				{set}
+			</section>
+			<select id="wordSelector" class="rounded border-r-8 border-r-blue-100 bg-blue-100 px-4 py-2 text-blue-900">
+				<option value="">Select a word</option>
+				{weekWords.map((word, index) => <option value={index}>{word}</option>)}
+			</select>
 		</nav>
 		<Flashcard words={weekWords} set={set} client:load />
 	</section>
 </Layout>
+
+<script>
+	document.addEventListener('astro:page-load', () => {
+		const wordSelector = document.getElementById('wordSelector') as HTMLSelectElement | null
+
+		if (wordSelector) {
+			wordSelector.addEventListener('change', (event) => {
+				const target = event.target as HTMLSelectElement
+				const selectedIndex = parseInt(target.value)
+				if (!isNaN(selectedIndex)) {
+					window.dispatchEvent(new CustomEvent('setFlashcardWord', { detail: { index: selectedIndex } }))
+				}
+			})
+		} else {
+			console.error('Word selector element not found')
+		}
+	})
+</script>

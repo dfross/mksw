@@ -46,7 +46,7 @@ interface Props {
 		<main class="flex h-full flex-grow flex-col justify-center">
 			<slot />
 		</main>
-		<footer class="mx-auto w-3/4 space-y-4 text-balance pt-9 text-center text-sm tracking-wide opacity-60">
+		<footer class="mx-auto w-3/4 space-y-4 text-balance pt-9 text-center text-sm tracking-wide text-blue-100">
 			<p>&copy; 2024 {BRAND_NAME} All rights reserved. For June ♥️.</p>
 		</footer>
 	</body>
@@ -54,6 +54,15 @@ interface Props {
 
 <style is:global lang="postcss">
 	.button {
-		@apply shadow-md w-full sm:w-48 rounded-lg bg-gradient-to-b from-cyan-300 to-blue-300 px-6 py-4 text-xl font-bold text-blue-900 hover:from-cyan-200 hover:to-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-100;
+		@apply shadow-sm flex items-center rounded bg-gradient-to-b from-cyan-300 to-blue-300 px-8 py-4 text-xl font-bold text-blue-900 hover:from-cyan-200 hover:to-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-100;
+	}
+	.button-icononly {
+		@apply px-6;
+	}
+	.button-iconleft {
+		@apply pl-6;
+	}
+	.button-iconright {
+		@apply pr-6;
 	}
 </style>
