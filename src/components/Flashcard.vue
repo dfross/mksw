@@ -19,6 +19,8 @@ const feedback = ref('')
 
 let recognition
 let microphoneStream = null
+let cleanupInterval
+let listenTimeout
 
 const initializeSpeechRecognition = () => {
 	if (recognitionSupported.value) {
@@ -74,11 +76,23 @@ const cleanup = () => {
 	if (recognition) {
 		recognition.abort()
 	}
+	if (listenTimeout) {
+		clearTimeout(listenTimeout)
+	}
 }
 
 const handleVisibilityChange = () => {
 	if (document.hidden || document.visibilityState === 'hidden') {
-		cleanup()
+		// Check if the browser is running on iOS
+		const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
+
+		if (isIOS && document.visibilityState === 'hidden') {
+			// The browser is running as a background task on iOS
+			cleanup()
+		} else {
+			// Handle other visibility change scenarios
+			cleanup()
+		}
 	}
 }
 
@@ -102,6 +116,12 @@ onMounted(() => {
 	document.addEventListener('visibilitychange', handleVisibilityChange)
 	window.addEventListener('blur', handleWindowBlur)
 	window.addEventListener('pagehide', handlePageHide)
+
+	cleanupInterval = setInterval(() => {
+		if (!document.hasFocus()) {
+			cleanup()
+		}
+	}, 1000) // Check every second
 })
 
 onUnmounted(() => {
@@ -110,6 +130,7 @@ onUnmounted(() => {
 	document.removeEventListener('visibilitychange', handleVisibilityChange)
 	window.removeEventListener('blur', handleWindowBlur)
 	window.removeEventListener('pagehide', handlePageHide)
+	clearInterval(cleanupInterval)
 	cleanup()
 })
 
@@ -228,6 +249,14 @@ const listenForWord = async () => {
 		isListening.value = true
 		resetRecognition() // Reset recognition before starting
 		recognition.start()
+
+		// Stop listening after 10 seconds if no result is received
+		listenTimeout = setTimeout(() => {
+			if (isListening.value) {
+				cleanup()
+				feedback.value = 'Listening timed out. Please try again.'
+			}
+		}, 10000)
 	} catch (err) {
 		console.error('Error accessing microphone:', err)
 		alert('Unable to access the microphone. Please check your microphone settings and try again.')
