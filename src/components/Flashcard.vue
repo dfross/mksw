@@ -69,6 +69,10 @@ const checkMicrophonePermission = async () => {
 	}
 }
 
+const handleBeforeUnload = () => {
+	stopMicrophone()
+}
+
 onMounted(() => {
 	speechSupported.value = 'speechSynthesis' in window
 	recognitionSupported.value = 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window
@@ -79,12 +83,14 @@ onMounted(() => {
 	window.addEventListener('keydown', handleKeydown)
 	window.addEventListener('setFlashcardWord', handleSetFlashcardWord)
 	document.addEventListener('visibilitychange', handleVisibilityChange)
+	window.addEventListener('beforeunload', handleBeforeUnload)
 })
 
 onUnmounted(() => {
 	window.removeEventListener('keydown', handleKeydown)
 	window.removeEventListener('setFlashcardWord', handleSetFlashcardWord)
 	document.removeEventListener('visibilitychange', handleVisibilityChange)
+	window.removeEventListener('beforeunload', handleBeforeUnload)
 	stopMicrophone()
 })
 
