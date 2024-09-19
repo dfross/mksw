@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import MenuIcon from 'vue-material-design-icons/Menu.vue'
 import ShuffleIcon from 'vue-material-design-icons/Shuffle.vue'
 import ChevronRightIcon from 'vue-material-design-icons/ChevronRight.vue'
@@ -70,6 +70,11 @@ onMounted(async () => {
 onUnmounted(() => {
 	window.removeEventListener('keydown', handleKeydown)
 	window.removeEventListener('setFlashcardWord', handleSetFlashcardWord)
+})
+
+// Watch for changes in currentIndex and clear feedback
+watch(currentIndex, () => {
+	feedback.value = ''
 })
 
 const nextWord = () => {
