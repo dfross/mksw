@@ -20,10 +20,7 @@ const feedback = ref('')
 let recognition
 let microphoneStream = null
 
-onMounted(() => {
-	speechSupported.value = 'speechSynthesis' in window
-	recognitionSupported.value = 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window
-
+const initializeSpeechRecognition = () => {
 	if (recognitionSupported.value) {
 		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
 		recognition = new SpeechRecognition()
@@ -31,6 +28,7 @@ onMounted(() => {
 		recognition.interimResults = false
 
 		recognition.onresult = (event) => {
+			console.log('Speech recognition result received')
 			const last = event.results.length - 1
 			const result = event.results[last][0].transcript.trim().toLowerCase()
 			const currentWord = props.words[currentIndex.value].toLowerCase()
@@ -52,10 +50,31 @@ onMounted(() => {
 		}
 
 		recognition.onend = () => {
+			console.log('Speech recognition ended')
 			isListening.value = false
 			stopMicrophone()
 		}
 	}
+}
+
+const checkMicrophonePermission = async () => {
+	try {
+		const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+		stream.getTracks().forEach((track) => track.stop())
+		microphoneAvailable.value = true
+	} catch (err) {
+		console.error('Microphone permission denied:', err)
+		microphoneAvailable.value = false
+		alert('Please grant microphone permission to use this feature.')
+	}
+}
+
+onMounted(() => {
+	speechSupported.value = 'speechSynthesis' in window
+	recognitionSupported.value = 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window
+
+	initializeSpeechRecognition()
+	checkMicrophonePermission()
 
 	window.addEventListener('keydown', handleKeydown)
 	window.addEventListener('setFlashcardWord', handleSetFlashcardWord)
@@ -93,7 +112,6 @@ const stopMicrophone = () => {
 	isListening.value = false
 }
 
-// Watch for changes in currentIndex and clear feedback
 watch(currentIndex, (newIndex) => {
 	feedback.value = ''
 	emit('wordChanged', newIndex)
@@ -160,7 +178,18 @@ const speakWord = () => {
 	window.speechSynthesis.speak(utterance)
 }
 
+const resetRecognition = () => {
+	if (recognition) {
+		recognition.onresult = null
+		recognition.onerror = null
+		recognition.onend = null
+		recognition = null
+	}
+	initializeSpeechRecognition()
+}
+
 const listenForWord = async () => {
+	console.log('Attempting to listen for word...')
 	if (!recognitionSupported.value) {
 		alert('Speech recognition is not supported in your browser.')
 		return
@@ -175,6 +204,7 @@ const listenForWord = async () => {
 
 		feedback.value = ''
 		isListening.value = true
+		resetRecognition() // Reset recognition before starting
 		recognition.start()
 	} catch (err) {
 		console.error('Error accessing microphone:', err)
