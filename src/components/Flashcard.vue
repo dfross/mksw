@@ -20,11 +20,9 @@ const feedback = ref('')
 let recognition
 let microphoneStream = null
 
-onMounted(async () => {
+onMounted(() => {
 	speechSupported.value = 'speechSynthesis' in window
 	recognitionSupported.value = 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window
-
-	// We'll check for microphone availability when needed, not on mount
 
 	if (recognitionSupported.value) {
 		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
@@ -102,7 +100,65 @@ watch(currentIndex, (newIndex) => {
 	stopMicrophone()
 })
 
-// ... (other methods remain the same)
+const nextWord = () => {
+	if (currentIndex.value < props.words.length - 1) {
+		currentIndex.value++
+	}
+}
+
+const previousWord = () => {
+	if (currentIndex.value > 0) {
+		currentIndex.value--
+	}
+}
+
+const selectRandomWord = () => {
+	const randomIndex = Math.floor(Math.random() * props.words.length)
+	currentIndex.value = randomIndex
+}
+
+const handleKeydown = (event) => {
+	if (event.key === 'ArrowRight' || event.code === 'Space') {
+		nextWord()
+	} else if (event.key === 'ArrowLeft') {
+		previousWord()
+	} else if (event.key === 'r' || event.key === 'R') {
+		selectRandomWord()
+	}
+}
+
+const handleSetFlashcardWord = (event) => {
+	const index = event.detail.index
+	if (index >= 0 && index < props.words.length) {
+		currentIndex.value = index
+	}
+}
+
+const speakWord = () => {
+	if (!speechSupported.value) {
+		alert('Speech synthesis is not supported in your browser.')
+		return
+	}
+
+	if (isSpeaking.value) {
+		window.speechSynthesis.cancel()
+	}
+
+	isSpeaking.value = true
+	const utterance = new SpeechSynthesisUtterance(props.words[currentIndex.value])
+
+	utterance.onend = () => {
+		isSpeaking.value = false
+	}
+
+	utterance.onerror = (event) => {
+		console.error('SpeechSynthesis error:', event)
+		isSpeaking.value = false
+		alert('An error occurred while trying to speak the word.')
+	}
+
+	window.speechSynthesis.speak(utterance)
+}
 
 const listenForWord = async () => {
 	if (!recognitionSupported.value) {
