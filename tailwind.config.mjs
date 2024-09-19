@@ -6,7 +6,7 @@ export default {
 	theme: {
 		extend: {
 			fontFamily: {
-				sans: ['IBM Plex Sans', ...defaultTheme.fontFamily.sans],
+				sans: ['Fredoka', ...defaultTheme.fontFamily.sans],
 			},
 		},
 	},
