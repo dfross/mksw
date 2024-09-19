@@ -69,8 +69,21 @@ const checkMicrophonePermission = async () => {
 	}
 }
 
-const handleBeforeUnload = () => {
+const cleanup = () => {
 	stopMicrophone()
+	if (recognition) {
+		recognition.abort()
+	}
+}
+
+const handleVisibilityChange = () => {
+	if (document.hidden) {
+		cleanup()
+	}
+}
+
+const handlePageHide = () => {
+	cleanup()
 }
 
 onMounted(() => {
@@ -83,22 +96,16 @@ onMounted(() => {
 	window.addEventListener('keydown', handleKeydown)
 	window.addEventListener('setFlashcardWord', handleSetFlashcardWord)
 	document.addEventListener('visibilitychange', handleVisibilityChange)
-	window.addEventListener('beforeunload', handleBeforeUnload)
+	window.addEventListener('pagehide', handlePageHide)
 })
 
 onUnmounted(() => {
 	window.removeEventListener('keydown', handleKeydown)
 	window.removeEventListener('setFlashcardWord', handleSetFlashcardWord)
 	document.removeEventListener('visibilitychange', handleVisibilityChange)
-	window.removeEventListener('beforeunload', handleBeforeUnload)
-	stopMicrophone()
+	window.removeEventListener('pagehide', handlePageHide)
+	cleanup()
 })
-
-const handleVisibilityChange = () => {
-	if (document.hidden) {
-		stopMicrophone()
-	}
-}
 
 const startMicrophone = async () => {
 	try {
@@ -112,7 +119,10 @@ const startMicrophone = async () => {
 
 const stopMicrophone = () => {
 	if (microphoneStream) {
-		microphoneStream.getTracks().forEach((track) => track.stop())
+		microphoneStream.getTracks().forEach((track) => {
+			track.stop()
+			microphoneStream.removeTrack(track)
+		})
 		microphoneStream = null
 	}
 	isListening.value = false
