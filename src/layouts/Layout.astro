@@ -3,6 +3,7 @@ import { ViewTransitions } from 'astro:transitions'
 import { AstroFont } from 'astro-font'
 import GoogleAnalytics from '../components/GoogleAnalytics.astro'
 import { BRAND_NAME, SITE_TITLE, SITE_DESCRIPTION } from '../constants'
+import PostHog from '../components/PostHog.astro'
 const { PAGE_TITLE = 'Home' } = Astro.props
 
 interface Props {
@@ -25,6 +26,7 @@ interface Props {
 		<link rel="stylesheet" href="/styles.css" />
 		<link rel="sitemap" href="/sitemap-index.xml" />
 		<GoogleAnalytics />
+		<PostHog />
 		<AstroFont
 			config={[
 				{
