@@ -288,7 +288,7 @@ const listenForWord = async () => {
 			<h2 class="text-7xl font-medium drop-shadow-md md:text-9xl" aria-live="polite">{{ words[currentIndex] }}</h2>
 			<div
 				v-if="feedback"
-				class="absolute bottom-3 flex gap-2 rounded-full border px-4 py-2 text-lg font-semibold"
+				class="absolute bottom-3 flex items-center gap-1 rounded-full border px-4 py-2 text-lg font-semibold"
 				:class="{
 					'border-green-300 bg-green-100 text-green-700': feedback.includes('Correct'),
 					'border-red-300 bg-red-200 text-red-800': feedback.includes('Not quite'),
