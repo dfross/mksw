@@ -70,28 +70,49 @@ const initializeSpeechRecognition = () => {
 	}
 }
 
-const checkMicrophonePermission = async () => {
-	try {
-		const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-		stream.getTracks().forEach((track) => track.stop())
-		microphoneAvailable.value = true
-	} catch (err) {
-		console.error('Microphone permission denied:', err)
-		microphoneAvailable.value = false
-		alert('Please grant microphone permission to use this feature.')
+const forceStopAudio = () => {
+	console.log('Force stopping all audio')
+
+	// Stop all audio contexts
+	if (window.AudioContext || window.webkitAudioContext) {
+		const AudioContext = window.AudioContext || window.webkitAudioContext
+		const audioContexts = []
+		while (AudioContext.getContexts && AudioContext.getContexts().length) {
+			audioContexts.push(AudioContext.getContexts()[0])
+		}
+		audioContexts.forEach((ctx) => {
+			if (ctx.state !== 'closed') {
+				ctx.close()
+			}
+		})
 	}
+
+	// Stop all audio tracks
+	if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+		navigator.mediaDevices
+			.getUserMedia({ audio: true })
+			.then((stream) => {
+				stream.getTracks().forEach((track) => track.stop())
+			})
+			.catch((err) => console.error('Error accessing media devices.', err))
+	}
+
+	// Stop speech recognition if it's running
+	if (recognition) {
+		recognition.abort()
+	}
+
+	// Reset state
+	isListening.value = false
+	microphoneStream = null
 }
 
 const cleanup = () => {
 	console.log('Cleanup function called')
-	stopMicrophone()
-	if (recognition) {
-		recognition.abort()
-	}
+	forceStopAudio()
 	if (listenTimeout) {
 		clearTimeout(listenTimeout)
 	}
-	isListening.value = false
 }
 
 const handleVisibilityChange = () => {
@@ -100,10 +121,7 @@ const handleVisibilityChange = () => {
 		const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
 		if (isIOS) {
 			// iOS-specific cleanup
-			cleanup()
-			if (recognition) {
-				recognition.stop()
-			}
+			forceStopAudio()
 		} else {
 			// General cleanup for other platforms
 			cleanup()
@@ -124,18 +142,23 @@ const handlePageHide = () => {
 	}
 }
 
+const handleBeforeUnload = () => {
+	console.log('Before unload event triggered')
+	forceStopAudio()
+}
+
 onMounted(() => {
 	speechSupported.value = 'speechSynthesis' in window
 	recognitionSupported.value = 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window
 
 	initializeSpeechRecognition()
-	checkMicrophonePermission()
 
 	window.addEventListener('keydown', handleKeydown)
 	window.addEventListener('setFlashcardWord', handleSetFlashcardWord)
 	document.addEventListener('visibilitychange', handleVisibilityChange)
 	window.addEventListener('blur', handleWindowBlur)
 	window.addEventListener('pagehide', handlePageHide)
+	window.addEventListener('beforeunload', handleBeforeUnload)
 
 	cleanupInterval = setInterval(() => {
 		if (!document.hasFocus()) {
@@ -150,6 +173,7 @@ onUnmounted(() => {
 	document.removeEventListener('visibilitychange', handleVisibilityChange)
 	window.removeEventListener('blur', handleWindowBlur)
 	window.removeEventListener('pagehide', handlePageHide)
+	window.removeEventListener('beforeunload', handleBeforeUnload)
 	clearInterval(cleanupInterval)
 	cleanup()
 })
@@ -172,23 +196,8 @@ const previousWord = () => {
 	}
 }
 
-const xorshift = (() => {
-	let x = 123456789,
-		y = 362436069,
-		z = 521288629,
-		w = 88675123
-	return () => {
-		const t = x ^ (x << 11)
-		x = y
-		y = z
-		z = w
-		w = w ^ (w >> 19) ^ (t ^ (t >> 8))
-		return w / 0x100000000 + 0.5
-	}
-})()
-
 const selectRandomWord = () => {
-	const randomIndex = Math.floor(xorshift() * props.words.length)
+	const randomIndex = Math.floor(Math.random() * props.words.length)
 	currentIndex.value = randomIndex
 }
 
@@ -224,7 +233,6 @@ const speakWord = () => {
 	isSpeaking.value = true
 	const utterance = new SpeechSynthesisUtterance(wordToSpeak)
 
-	utterance.text = wordToSpeak
 	utterance.rate = 0.8 // Slightly slower rate for clearer pronunciation
 	utterance.pitch = 1 // Normal pitch
 
@@ -266,11 +274,15 @@ const listenForWord = async () => {
 	}
 
 	try {
-		await checkMicrophonePermission()
-		if (!microphoneAvailable.value) {
-			feedback.value = 'Unable to access the microphone. Please check your microphone settings and try again.'
-			return
-		}
+		// Force stop any existing audio before starting new
+		forceStopAudio()
+
+		// Create a new audio context
+		const AudioContext = window.AudioContext || window.webkitAudioContext
+		const audioContext = new AudioContext()
+
+		const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+		microphoneStream = stream
 
 		feedback.value = ''
 		isListening.value = true
