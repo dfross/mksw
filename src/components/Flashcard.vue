@@ -1,6 +1,5 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch } from 'vue'
-import MenuIcon from 'vue-material-design-icons/Menu.vue'
 import ShuffleIcon from 'vue-material-design-icons/Shuffle.vue'
 import ChevronRightIcon from 'vue-material-design-icons/ChevronRight.vue'
 import ChevronLeftIcon from 'vue-material-design-icons/ChevronLeft.vue'
@@ -21,22 +20,21 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['wordChanged'])
-
 const currentIndex = ref(0)
-const feedback = ref('')
-const isListening = ref(false)
 const isSpeaking = ref(false)
+const isListening = ref(false)
 const speechSupported = ref(false)
 const recognitionSupported = ref(false)
 const microphoneAvailable = ref(false)
+const feedback = ref('')
 
-let recognition = null
+let recognition
 let microphoneStream = null
 let cleanupInterval
 let listenTimeout
 
 const initializeSpeechRecognition = () => {
-	if (recognitionSupported.value && !recognition) {
+	if (recognitionSupported.value) {
 		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
 		recognition = new SpeechRecognition()
 		recognition.continuous = false
@@ -72,6 +70,18 @@ const initializeSpeechRecognition = () => {
 	}
 }
 
+const checkMicrophonePermission = async () => {
+	try {
+		const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+		stream.getTracks().forEach((track) => track.stop())
+		microphoneAvailable.value = true
+	} catch (err) {
+		console.error('Microphone permission denied:', err)
+		microphoneAvailable.value = false
+		alert('Please grant microphone permission to use this feature.')
+	}
+}
+
 const cleanup = () => {
 	stopMicrophone()
 	if (recognition) {
@@ -84,7 +94,16 @@ const cleanup = () => {
 
 const handleVisibilityChange = () => {
 	if (document.hidden || document.visibilityState === 'hidden') {
-		cleanup()
+		// Check if the browser is running on iOS
+		const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
+
+		if (isIOS && document.visibilityState === 'hidden') {
+			// The browser is running as a background task on iOS
+			cleanup()
+		} else {
+			// Handle other visibility change scenarios
+			cleanup()
+		}
 	}
 }
 
@@ -101,6 +120,7 @@ onMounted(() => {
 	recognitionSupported.value = 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window
 
 	initializeSpeechRecognition()
+	checkMicrophonePermission()
 
 	window.addEventListener('keydown', handleKeydown)
 	window.addEventListener('setFlashcardWord', handleSetFlashcardWord)
@@ -112,7 +132,7 @@ onMounted(() => {
 		if (!document.hasFocus()) {
 			cleanup()
 		}
-	}, 5000)
+	}, 1000) // Check every second
 })
 
 onUnmounted(() => {
@@ -124,39 +144,6 @@ onUnmounted(() => {
 	clearInterval(cleanupInterval)
 	cleanup()
 })
-
-const startMicrophone = async () => {
-	if (!microphoneStream) {
-		try {
-			microphoneStream = await new Promise((resolve, reject) => {
-				setTimeout(async () => {
-					try {
-						const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-						resolve(stream)
-					} catch (err) {
-						reject(err)
-					}
-				}, 100)
-			})
-			microphoneAvailable.value = true
-		} catch (err) {
-			console.error('Microphone not available:', err)
-			microphoneAvailable.value = false
-			feedback.value = 'Unable to access the microphone. Please check your settings and try again.'
-			throw err
-		}
-	}
-}
-
-const stopMicrophone = () => {
-	if (microphoneStream) {
-		microphoneStream.getTracks().forEach((track) => {
-			track.stop()
-		})
-		microphoneStream = null
-	}
-	isListening.value = false
-}
 
 watch(currentIndex, (newIndex) => {
 	feedback.value = ''
@@ -228,12 +215,10 @@ const speakWord = () => {
 	isSpeaking.value = true
 	const utterance = new SpeechSynthesisUtterance(wordToSpeak)
 
-	// Force the speech synthesis to treat the input as a word
 	utterance.text = wordToSpeak
 	utterance.rate = 0.8 // Slightly slower rate for clearer pronunciation
 	utterance.pitch = 1 // Normal pitch
 
-	// Ensure the utterance is treated as a word, not individual letters
 	if (wordToSpeak.length === 1 && wordToSpeak.toLowerCase() === 'i') {
 		utterance.text = `- ${wordToSpeak}`
 	} else {
@@ -253,14 +238,14 @@ const speakWord = () => {
 	window.speechSynthesis.speak(utterance)
 }
 
-const resetRecognition = () => {
-	if (recognition) {
-		recognition.abort()
-		recognition.onresult = null
-		recognition.onerror = null
-		recognition.onend = null
-		initializeSpeechRecognition()
+const stopMicrophone = () => {
+	if (microphoneStream) {
+		microphoneStream.getTracks().forEach((track) => {
+			track.stop()
+		})
+		microphoneStream = null
 	}
+	isListening.value = false
 }
 
 const listenForWord = async () => {
@@ -271,10 +256,14 @@ const listenForWord = async () => {
 	}
 
 	try {
-		await startMicrophone()
+		await checkMicrophonePermission()
+		if (!microphoneAvailable.value) {
+			feedback.value = 'Unable to access the microphone. Please check your microphone settings and try again.'
+			return
+		}
+
 		feedback.value = ''
 		isListening.value = true
-		resetRecognition()
 		recognition.start()
 
 		listenTimeout = setTimeout(() => {
