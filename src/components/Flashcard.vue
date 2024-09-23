@@ -8,7 +8,6 @@ import EarHearingIcon from 'vue-material-design-icons/EarHearing.vue'
 import MicrophoneIcon from 'vue-material-design-icons/Microphone.vue'
 import CheckboxMarkedCircleIcon from 'vue-material-design-icons/CheckboxMarkedCircle.vue'
 import AlphaXCircleIcon from 'vue-material-design-icons/AlphaXCircle.vue'
-import { defineProps } from 'vue'
 
 const props = defineProps({
 	words: {
@@ -129,7 +128,16 @@ onUnmounted(() => {
 const startMicrophone = async () => {
 	if (!microphoneStream) {
 		try {
-			microphoneStream = await navigator.mediaDevices.getUserMedia({ audio: true })
+			microphoneStream = await new Promise((resolve, reject) => {
+				setTimeout(async () => {
+					try {
+						const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+						resolve(stream)
+					} catch (err) {
+						reject(err)
+					}
+				}, 100)
+			})
 			microphoneAvailable.value = true
 		} catch (err) {
 			console.error('Microphone not available:', err)
