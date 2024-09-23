@@ -47,9 +47,9 @@ const initializeSpeechRecognition = () => {
 			const currentWord = props.words[currentIndex.value].toLowerCase()
 
 			if (result === currentWord) {
-				feedback.value = 'Correct!'
+				feedback.value = 'Correct! Well done!'
 			} else {
-				feedback.value = `Not quite. Try again.`
+				feedback.value = `Not quite. The word is "${currentWord}". You said "${result}".`
 			}
 			isListening.value = false
 			stopMicrophone()
@@ -83,6 +83,7 @@ const checkMicrophonePermission = async () => {
 }
 
 const cleanup = () => {
+	console.log('Cleanup function called')
 	stopMicrophone()
 	if (recognition) {
 		recognition.abort()
@@ -90,29 +91,37 @@ const cleanup = () => {
 	if (listenTimeout) {
 		clearTimeout(listenTimeout)
 	}
+	isListening.value = false
 }
 
 const handleVisibilityChange = () => {
 	if (document.hidden || document.visibilityState === 'hidden') {
-		// Check if the browser is running on iOS
+		console.log('Page visibility changed to hidden')
 		const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
-
-		if (isIOS && document.visibilityState === 'hidden') {
-			// The browser is running as a background task on iOS
+		if (isIOS) {
+			// iOS-specific cleanup
 			cleanup()
+			if (recognition) {
+				recognition.stop()
+			}
 		} else {
-			// Handle other visibility change scenarios
+			// General cleanup for other platforms
 			cleanup()
 		}
 	}
 }
 
 const handleWindowBlur = () => {
+	console.log('Window blur event triggered')
 	cleanup()
 }
 
 const handlePageHide = () => {
+	console.log('Page hide event triggered')
 	cleanup()
+	if (recognition) {
+		recognition.stop()
+	}
 }
 
 onMounted(() => {
@@ -239,6 +248,7 @@ const speakWord = () => {
 }
 
 const stopMicrophone = () => {
+	console.log('Stopping microphone')
 	if (microphoneStream) {
 		microphoneStream.getTracks().forEach((track) => {
 			track.stop()
