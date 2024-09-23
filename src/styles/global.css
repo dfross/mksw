@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		text-wrap: balance;
+	}
+
+	.visually-hidden {
+		position: absolute;
+		position: absolute !important;
+		width: 1px !important;
+		height: 1px !important;
+		padding: 0 !important;
+		margin: -1px !important;
+		overflow: hidden !important;
+		clip: rect(0, 0, 0, 0) !important;
+		white-space: nowrap !important;
+		border: 0 !important;
+	}
+
+	.button {
+		@apply flex items-center rounded bg-gradient-to-b from-cyan-300 to-blue-300 px-6 py-3 text-xl text-blue-900 shadow-sm hover:from-cyan-200 hover:to-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-100;
+	}
+	.button-icononly {
+		@apply px-4;
+	}
+	.button-iconleft {
+		@apply pl-3;
+	}
+	.button-iconright {
+		@apply pr-3;
+	}
+}

@@ -4,26 +4,40 @@ import MenuIcon from 'vue-material-design-icons/Menu.vue'
 import ShuffleIcon from 'vue-material-design-icons/Shuffle.vue'
 import ChevronRightIcon from 'vue-material-design-icons/ChevronRight.vue'
 import ChevronLeftIcon from 'vue-material-design-icons/ChevronLeft.vue'
-import VolumeHighIcon from 'vue-material-design-icons/VolumeHigh.vue'
+import EarHearingIcon from 'vue-material-design-icons/EarHearing.vue'
 import MicrophoneIcon from 'vue-material-design-icons/Microphone.vue'
+import CheckboxMarkedCircleIcon from 'vue-material-design-icons/CheckboxMarkedCircle.vue'
+import AlphaXCircleIcon from 'vue-material-design-icons/AlphaXCircle.vue'
+import { defineProps } from 'vue'
 
-const props = defineProps(['words', 'set'])
+const props = defineProps({
+	words: {
+		type: Array,
+		required: true,
+	},
+	set: {
+		type: String,
+		required: true,
+	},
+})
+
 const emit = defineEmits(['wordChanged'])
+
 const currentIndex = ref(0)
-const isSpeaking = ref(false)
+const feedback = ref('')
 const isListening = ref(false)
+const isSpeaking = ref(false)
 const speechSupported = ref(false)
 const recognitionSupported = ref(false)
 const microphoneAvailable = ref(false)
-const feedback = ref('')
 
-let recognition
+let recognition = null
 let microphoneStream = null
 let cleanupInterval
 let listenTimeout
 
 const initializeSpeechRecognition = () => {
-	if (recognitionSupported.value) {
+	if (recognitionSupported.value && !recognition) {
 		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
 		recognition = new SpeechRecognition()
 		recognition.continuous = false
@@ -59,18 +73,6 @@ const initializeSpeechRecognition = () => {
 	}
 }
 
-const checkMicrophonePermission = async () => {
-	try {
-		const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-		stream.getTracks().forEach((track) => track.stop())
-		microphoneAvailable.value = true
-	} catch (err) {
-		console.error('Microphone permission denied:', err)
-		microphoneAvailable.value = false
-		alert('Please grant microphone permission to use this feature.')
-	}
-}
-
 const cleanup = () => {
 	stopMicrophone()
 	if (recognition) {
@@ -83,16 +85,7 @@ const cleanup = () => {
 
 const handleVisibilityChange = () => {
 	if (document.hidden || document.visibilityState === 'hidden') {
-		// Check if the browser is running on iOS
-		const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
-
-		if (isIOS && document.visibilityState === 'hidden') {
-			// The browser is running as a background task on iOS
-			cleanup()
-		} else {
-			// Handle other visibility change scenarios
-			cleanup()
-		}
+		cleanup()
 	}
 }
 
@@ -109,7 +102,6 @@ onMounted(() => {
 	recognitionSupported.value = 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window
 
 	initializeSpeechRecognition()
-	checkMicrophonePermission()
 
 	window.addEventListener('keydown', handleKeydown)
 	window.addEventListener('setFlashcardWord', handleSetFlashcardWord)
@@ -121,7 +113,7 @@ onMounted(() => {
 		if (!document.hasFocus()) {
 			cleanup()
 		}
-	}, 1000) // Check every second
+	}, 5000)
 })
 
 onUnmounted(() => {
@@ -135,12 +127,16 @@ onUnmounted(() => {
 })
 
 const startMicrophone = async () => {
-	try {
-		microphoneStream = await navigator.mediaDevices.getUserMedia({ audio: true })
-		microphoneAvailable.value = true
-	} catch (err) {
-		console.error('Microphone not available:', err)
-		microphoneAvailable.value = false
+	if (!microphoneStream) {
+		try {
+			microphoneStream = await navigator.mediaDevices.getUserMedia({ audio: true })
+			microphoneAvailable.value = true
+		} catch (err) {
+			console.error('Microphone not available:', err)
+			microphoneAvailable.value = false
+			feedback.value = 'Unable to access the microphone. Please check your settings and try again.'
+			throw err
+		}
 	}
 }
 
@@ -148,7 +144,6 @@ const stopMicrophone = () => {
 	if (microphoneStream) {
 		microphoneStream.getTracks().forEach((track) => {
 			track.stop()
-			microphoneStream.removeTrack(track)
 		})
 		microphoneStream = null
 	}
@@ -173,8 +168,23 @@ const previousWord = () => {
 	}
 }
 
+const xorshift = (() => {
+	let x = 123456789,
+		y = 362436069,
+		z = 521288629,
+		w = 88675123
+	return () => {
+		const t = x ^ (x << 11)
+		x = y
+		y = z
+		z = w
+		w = w ^ (w >> 19) ^ (t ^ (t >> 8))
+		return w / 0x100000000 + 0.5
+	}
+})()
+
 const selectRandomWord = () => {
-	const randomIndex = Math.floor(Math.random() * props.words.length)
+	const randomIndex = Math.floor(xorshift() * props.words.length)
 	currentIndex.value = randomIndex
 }
 
@@ -197,16 +207,30 @@ const handleSetFlashcardWord = (event) => {
 
 const speakWord = () => {
 	if (!speechSupported.value) {
-		alert('Speech synthesis is not supported in your browser.')
+		feedback.value = 'Speech synthesis is not supported in your browser.'
 		return
 	}
+
+	const wordToSpeak = props.words[currentIndex.value].trim()
 
 	if (isSpeaking.value) {
 		window.speechSynthesis.cancel()
 	}
 
 	isSpeaking.value = true
-	const utterance = new SpeechSynthesisUtterance(props.words[currentIndex.value])
+	const utterance = new SpeechSynthesisUtterance(wordToSpeak)
+
+	// Force the speech synthesis to treat the input as a word
+	utterance.text = wordToSpeak
+	utterance.rate = 0.8 // Slightly slower rate for clearer pronunciation
+	utterance.pitch = 1 // Normal pitch
+
+	// Ensure the utterance is treated as a word, not individual letters
+	if (wordToSpeak.length === 1 && wordToSpeak.toLowerCase() === 'i') {
+		utterance.text = `- ${wordToSpeak}`
+	} else {
+		utterance.text = wordToSpeak
+	}
 
 	utterance.onend = () => {
 		isSpeaking.value = false
@@ -215,7 +239,7 @@ const speakWord = () => {
 	utterance.onerror = (event) => {
 		console.error('SpeechSynthesis error:', event)
 		isSpeaking.value = false
-		alert('An error occurred while trying to speak the word.')
+		feedback.value = 'An error occurred while trying to speak the word.'
 	}
 
 	window.speechSynthesis.speak(utterance)
@@ -223,34 +247,28 @@ const speakWord = () => {
 
 const resetRecognition = () => {
 	if (recognition) {
+		recognition.abort()
 		recognition.onresult = null
 		recognition.onerror = null
 		recognition.onend = null
-		recognition = null
+		initializeSpeechRecognition()
 	}
-	initializeSpeechRecognition()
 }
 
 const listenForWord = async () => {
 	console.log('Attempting to listen for word...')
 	if (!recognitionSupported.value) {
-		alert('Speech recognition is not supported in your browser.')
+		feedback.value = 'Speech recognition is not supported in your browser.'
 		return
 	}
 
 	try {
 		await startMicrophone()
-		if (!microphoneAvailable.value) {
-			alert('No microphone detected or microphone access is denied.')
-			return
-		}
-
 		feedback.value = ''
 		isListening.value = true
-		resetRecognition() // Reset recognition before starting
+		resetRecognition()
 		recognition.start()
 
-		// Stop listening after 10 seconds if no result is received
 		listenTimeout = setTimeout(() => {
 			if (isListening.value) {
 				cleanup()
@@ -259,7 +277,7 @@ const listenForWord = async () => {
 		}, 10000)
 	} catch (err) {
 		console.error('Error accessing microphone:', err)
-		alert('Unable to access the microphone. Please check your microphone settings and try again.')
+		feedback.value = 'Unable to access the microphone. Please check your microphone settings and try again.'
 	}
 }
 </script>
@@ -267,10 +285,9 @@ const listenForWord = async () => {
 <template>
 	<div class="flex flex-col items-center pt-9">
 		<div
-			class="relative mb-9 flex h-[30vh] w-full cursor-pointer items-center justify-center rounded-lg bg-gradient-to-b from-cyan-100 to-blue-100 text-blue-900 shadow-2xl sm:h-[50vh] sm:max-h-[500px]"
+			class="relative mb-9 flex h-[30vh] w-full items-center justify-center rounded-lg bg-gradient-to-b from-cyan-100 to-blue-100 text-blue-900 shadow-2xl sm:h-[50vh] sm:max-h-[500px]"
 			role="region"
-			aria-label="Flashcard"
-			@click="listenForWord">
+			aria-label="Flashcard">
 			<h2 class="text-7xl font-medium drop-shadow-md md:text-9xl" aria-live="polite">{{ words[currentIndex] }}</h2>
 			<div
 				v-if="feedback"
@@ -279,6 +296,8 @@ const listenForWord = async () => {
 					'border-green-300 bg-green-100 text-green-700': feedback.includes('Correct'),
 					'border-red-300 bg-red-100 text-red-700': feedback.includes('Not quite'),
 				}">
+				<checkbox-marked-circle-icon v-if="feedback.includes('Correct')" :size="20" class="mr-2 text-green-700" />
+				<alpha-x-circle-icon v-if="feedback.includes('Not quite')" :size="20" class="mr-2 text-red-700" />
 				{{ feedback }}
 			</div>
 			<small class="absolute bottom-3 right-3" aria-live="polite">{{ currentIndex + 1 }}/{{ words.length }}</small>
@@ -293,51 +312,22 @@ const listenForWord = async () => {
 					<chevron-left-icon />
 					Prev
 				</button>
-				<button class="button button-icononly" @click="selectRandomWord" aria-label="Random word"><shuffle-icon /></button>
+				<button class="button button-icon" @click="selectRandomWord" aria-label="Random word">
+					<shuffle-icon />
+				</button>
 				<button class="button button-iconright" @click="nextWord" :disabled="currentIndex === words.length - 1" aria-label="Next word">
 					Next
 					<chevron-right-icon />
 				</button>
 			</div>
 			<div class="flex gap-2">
-				<button
-					class="button button-icononly"
-					@click="speakWord"
-					:disabled="!speechSupported || isSpeaking"
-					:aria-label="isSpeaking ? 'Speaking...' : 'Read word aloud'">
-					<volume-high-icon :class="{ 'opacity-50': isSpeaking }" />
+				<button class="button button-icon" @click="speakWord" :disabled="!speechSupported" aria-label="Speak word">
+					<ear-hearing-icon />
 				</button>
-				<button
-					class="button button-icononly"
-					@click="listenForWord"
-					:disabled="!recognitionSupported || !microphoneAvailable || isListening"
-					:aria-label="
-						!recognitionSupported
-							? 'Speech recognition not supported'
-							: !microphoneAvailable
-								? 'Microphone not available'
-								: isListening
-									? 'Listening...'
-									: 'Listen for pronunciation'
-					">
-					<microphone-icon :class="{ 'animate-pulse': isListening, 'opacity-50': !recognitionSupported || !microphoneAvailable }" />
+				<button class="button button-icon" @click="listenForWord" :disabled="!recognitionSupported" aria-label="Listen for word">
+					<microphone-icon />
 				</button>
 			</div>
 		</div>
 	</div>
 </template>
-
-<style scoped>
-@keyframes pulse {
-	0%,
-	100% {
-		opacity: 1;
-	}
-	50% {
-		opacity: 0.5;
-	}
-}
-.animate-pulse {
-	animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-</style>

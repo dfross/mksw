@@ -6,7 +6,7 @@ export default {
 	theme: {
 		extend: {
 			fontFamily: {
-				sans: ['Fredoka', ...defaultTheme.fontFamily.sans],
+				sans: ['Lexand', ...defaultTheme.fontFamily.sans],
 			},
 		},
 	},

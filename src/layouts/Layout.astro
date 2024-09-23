@@ -1,4 +1,5 @@
 ---
+import '../styles/global.css'
 import { ViewTransitions } from 'astro:transitions'
 import { AstroFont } from 'astro-font'
 import { BRAND_NAME, SITE_TITLE, SITE_DESCRIPTION } from '../constants'
@@ -14,7 +15,7 @@ interface Props {
 <html lang="en" class="h-full">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, user-scalable=no" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" maximum-scale="1" />
 		<meta name="description" content={SITE_DESCRIPTION} />
 		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
@@ -22,15 +23,14 @@ interface Props {
 		<link rel="manifest" href="/site.webmanifest" />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link rel="stylesheet" href="/styles.css" />
 		<link rel="sitemap" href="/sitemap-index.xml" />
 		<PostHog />
 		<AstroFont
 			config={[
 				{
 					src: [],
-					name: 'Fredoka',
-					googleFontsURL: 'https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap',
+					name: 'Lexand',
+					googleFontsURL: 'https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap',
 					preload: true,
 					display: 'swap',
 					selector: 'body',
@@ -51,18 +51,3 @@ interface Props {
 		</footer>
 	</body>
 </html>
-
-<style is:global lang="postcss">
-	.button {
-		@apply shadow-sm flex items-center rounded bg-gradient-to-b from-cyan-300 to-blue-300 px-6 py-3 text-xl  text-blue-900 hover:from-cyan-200 hover:to-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-100;
-	}
-	.button-icononly {
-		@apply px-4;
-	}
-	.button-iconleft {
-		@apply pl-3;
-	}
-	.button-iconright {
-		@apply pr-3;
-	}
-</style>
