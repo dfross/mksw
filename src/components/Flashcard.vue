@@ -47,9 +47,9 @@ const initializeSpeechRecognition = () => {
 			const currentWord = props.words[currentIndex.value].toLowerCase()
 
 			if (result === currentWord) {
-				feedback.value = 'Correct! Well done!'
+				feedback.value = 'Correct!'
 			} else {
-				feedback.value = `Not quite. The word is "${currentWord}". You said "${result}".`
+				feedback.value = `Not quite. Try again.`
 			}
 			isListening.value = false
 			stopMicrophone()
@@ -288,13 +288,13 @@ const listenForWord = async () => {
 			<h2 class="text-7xl font-medium drop-shadow-md md:text-9xl" aria-live="polite">{{ words[currentIndex] }}</h2>
 			<div
 				v-if="feedback"
-				class="absolute bottom-3 rounded-full border px-4 py-2 text-lg font-medium"
+				class="absolute bottom-3 flex gap-2 rounded-full border px-4 py-2 text-lg font-semibold"
 				:class="{
 					'border-green-300 bg-green-100 text-green-700': feedback.includes('Correct'),
-					'border-red-300 bg-red-100 text-red-700': feedback.includes('Not quite'),
+					'border-red-300 bg-red-200 text-red-800': feedback.includes('Not quite'),
 				}">
-				<checkbox-marked-circle-icon v-if="feedback.includes('Correct')" :size="20" class="mr-2 text-green-700" />
-				<alpha-x-circle-icon v-if="feedback.includes('Not quite')" :size="20" class="mr-2 text-red-700" />
+				<checkbox-marked-circle-icon v-if="feedback.includes('Correct')" :size="24" class="mr-2 text-green-700" />
+				<alpha-x-circle-icon v-if="feedback.includes('Not quite')" :size="24" class="mr-2 text-red-700" />
 				{{ feedback }}
 			</div>
 			<small class="absolute bottom-3 right-3" aria-live="polite">{{ currentIndex + 1 }}/{{ words.length }}</small>
