@@ -6,6 +6,10 @@ import { BRAND_NAME } from '../constants'
 import { Image } from 'astro:assets'
 
 export function getStaticPaths() {
+	if (!wordsData || !Array.isArray(wordsData.weeks)) {
+		console.error('Invalid words data')
+		return []
+	}
 	return wordsData.weeks.map((week) => ({
 		params: { set: week.set },
 		props: { weekWords: week.words },
@@ -14,6 +18,7 @@ export function getStaticPaths() {
 
 const { set } = Astro.params
 const { weekWords } = Astro.props
+let loading = false // You can manage loading state here as needed
 ---
 
 <Layout PAGE_TITLE={`Set ${set} Sight Words`}>
@@ -27,7 +32,11 @@ const { weekWords } = Astro.props
 				<Image src="/ChevronRight.svg" alt="" height="16" width="16" />
 				{set}
 			</section>
-			<select id="wordSelector" class="flex-shrink-0 rounded border-r-8 border-r-blue-100 bg-blue-100 px-4 py-2 text-blue-900">
+			<select
+				id="wordSelector"
+				aria-label="Select a sight word"
+				class="flex-shrink-0 rounded border-r-8 border-r-blue-100 bg-blue-100 px-4 py-2 text-blue-900"
+				disabled={loading}>
 				<option value="">Select a word</option>
 				{weekWords.map((word, index) => <option value={index}>{word}</option>)}
 			</select>
@@ -41,13 +50,20 @@ const { weekWords } = Astro.props
 		const wordSelector = document.getElementById('wordSelector') as HTMLSelectElement | null
 
 		if (wordSelector) {
-			wordSelector.addEventListener('change', (event) => {
+			const changeHandler = (event: Event) => {
 				const target = event.target as HTMLSelectElement
 				const selectedIndex = parseInt(target.value)
 				if (!isNaN(selectedIndex)) {
 					window.dispatchEvent(new CustomEvent('setFlashcardWord', { detail: { index: selectedIndex } }))
 				}
-			})
+			}
+
+			wordSelector.addEventListener('change', changeHandler)
+
+			// Cleanup function to remove the event listener
+			return () => {
+				wordSelector.removeEventListener('change', changeHandler)
+			}
 		} else {
 			console.error('Word selector element not found')
 		}

@@ -33,6 +33,18 @@ let microphoneStream = null
 let cleanupInterval
 let listenTimeout
 
+const checkMicrophonePermissions = async () => {
+	try {
+		const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+		microphoneAvailable.value = true
+		stream.getTracks().forEach((track) => track.stop()) // Stop tracks immediately after checking.
+	} catch (err) {
+		console.error('Microphone permissions not granted:', err)
+		microphoneAvailable.value = false
+		feedback.value = 'Microphone access is required for voice recognition.'
+	}
+}
+
 const initializeSpeechRecognition = () => {
 	if (recognitionSupported.value) {
 		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
@@ -58,7 +70,23 @@ const initializeSpeechRecognition = () => {
 		recognition.onerror = (event) => {
 			console.error('Speech recognition error:', event.error)
 			isListening.value = false
-			feedback.value = "Sorry, I couldn't hear you. Please try again."
+
+			switch (event.error) {
+				case 'no-speech':
+					feedback.value = 'No speech detected. Please try again.'
+					break
+				case 'audio-capture':
+					feedback.value = 'Please ensure your microphone is not blocked and try again.'
+					break
+				case 'not-allowed':
+					feedback.value = 'Microphone access has been denied. Check your browser settings.'
+					break
+				case 'service-not-allowed':
+					feedback.value = 'The microphone service is not allowed. Check your permissions.'
+					break
+				default:
+					feedback.value = "Sorry, I couldn't hear you. Please try again."
+			}
 			stopMicrophone()
 		}
 
@@ -67,6 +95,8 @@ const initializeSpeechRecognition = () => {
 			isListening.value = false
 			stopMicrophone()
 		}
+	} else {
+		feedback.value = 'Speech recognition is not supported in your browser.'
 	}
 }
 
@@ -147,9 +177,11 @@ const handleBeforeUnload = () => {
 	forceStopAudio()
 }
 
-onMounted(() => {
+onMounted(async () => {
 	speechSupported.value = 'speechSynthesis' in window
 	recognitionSupported.value = 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window
+
+	checkMicrophonePermissions() // Check permissions
 
 	initializeSpeechRecognition()
 
@@ -343,7 +375,7 @@ const listenForWord = async () => {
 				<button class="button button-icon" @click="speakWord" :disabled="!speechSupported" aria-label="Speak word">
 					<ear-hearing-icon />
 				</button>
-				<button class="button button-icon" @click="listenForWord" :disabled="!recognitionSupported" aria-label="Listen for word">
+				<button class="button button-icon" @click="listenForWord" :disabled="!microphoneAvailable" aria-label="Listen for word">
 					<microphone-icon />
 				</button>
 			</div>

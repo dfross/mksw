@@ -24,6 +24,7 @@ interface Props {
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link rel="sitemap" href="/sitemap-index.xml" />
+		<link rel="canonical" href="https://mksw.netlify.app/" />
 		<PostHog />
 		<AstroFont
 			config={[
@@ -46,7 +47,7 @@ interface Props {
 		<main class="flex h-full flex-grow flex-col justify-center">
 			<slot />
 		</main>
-		<footer class="mx-auto w-3/4 space-y-4 text-balance pt-9 text-center text-sm tracking-wide text-blue-100">
+		<footer class="mx-auto w-3/4 space-y-4 text-balance pt-9 text-center text-sm tracking-wide text-blue-100" role="contentinfo">
 			<p>&copy; 2024 {BRAND_NAME} All rights reserved. For June ♥️.</p>
 		</footer>
 	</body>

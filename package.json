@@ -15,17 +15,17 @@
 		"@astrojs/sitemap": "^3.1.6",
 		"@astrojs/tailwind": "^5.1.1",
 		"@astrojs/vue": "^4.5.1",
-		"@types/node": "^22.5.5",
-		"astro": "^4.15.8",
+		"@types/node": "^22.6.1",
+		"astro": "^4.15.9",
 		"astro-font": "^0.1.81",
 		"astro-icon": "^1.1.1",
 		"easy-speech": "^2.4.0",
 		"prettier": "^3.3.3",
 		"prettier-plugin-astro": "^0.14.1",
 		"prettier-plugin-tailwindcss": "^0.6.6",
-		"tailwindcss": "^3.4.12",
+		"tailwindcss": "^3.4.13",
 		"typescript": "^5.6.2",
-		"vue": "^3.5.6",
+		"vue": "^3.5.8",
 		"vue-material-design-icons": "^5.3.0"
 	}
 }

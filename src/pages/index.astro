@@ -14,17 +14,19 @@ import { BRAND_NAME } from '../constants'
 			<ul class="mx-auto space-y-3 md:w-1/2 md:min-w-fit" role="list">
 				{
 					words.weeks.map((week) => (
-						<li>
-							<a
-								href={`/${week.set}`}
-								class="button flex min-w-full items-center justify-around gap-4 font-medium"
-								aria-label={`${week.set} - ${week.words.length} words`}>
-								<span>{week.set}</span>
-								<span class="rounded-full bg-blue-900 px-3 py-1 text-sm text-blue-100" aria-hidden="true">
-									{week.words.length} Words
-								</span>
-							</a>
-						</li>
+						<Fragment key={week.set}>
+							<li>
+								<a
+									href={`/${week.set}`}
+									class="button flex min-w-full items-center justify-around gap-4 font-medium"
+									aria-label={`${week.set} - ${week.words.length} words`}>
+									<span>{week.set}</span>
+									<span class="rounded-full bg-blue-900 px-3 py-1 text-sm text-blue-100" aria-hidden="true">
+										{week.words.length} Words
+									</span>
+								</a>
+							</li>
+						</Fragment>
 					))
 				}
 			</ul>
