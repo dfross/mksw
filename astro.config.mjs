@@ -8,5 +8,5 @@ import playformCompress from '@playform/compress'
 import playformInline from '@playform/inline'
 export default defineConfig({
 	site: 'https://mksw.netlify.app',
-	integrations: [tailwind(), vue(), sitemap(), icon(), playformCompress(), playformInline(), compressor()],
+	integrations: [tailwind(), vue(), sitemap(), icon(), playformInline(), playformCompress(), compressor()],
 })
