@@ -15,7 +15,7 @@
 		"@astrojs/sitemap": "^3.2.1",
 		"@astrojs/tailwind": "^5.1.2",
 		"@astrojs/vue": "^4.5.2",
-		"@playform/compress": "^0.1.5",
+		"@playform/compress": "^0.1.6",
 		"@playform/inline": "^0.1.0",
 		"@types/node": "^22.7.9",
 		"astro": "^4.16.7",
