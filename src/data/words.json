@@ -1,11 +1,11 @@
 {
 	"weeks": [
 		{
-			"set": "1st 9 Weeks",
+			"set": "1st Set of Words",
 			"words": ["the", "I", "at", "and", "a", "if", "it", "its", "is", "in", "as", "am", "an", "not", "on", "did", "said", "can"]
 		},
 		{
-			"set": "2nd 9 Weeks",
+			"set": "2nd Set of Words",
 			"words": [
 				"to",
 				"do",
@@ -44,7 +44,7 @@
 			]
 		},
 		{
-			"set": "3rd 9 Weeks",
+			"set": "3rd Set of Words",
 			"words": [
 				"you",
 				"next",
@@ -90,7 +90,7 @@
 			]
 		},
 		{
-			"set": "4th 9 Weeks",
+			"set": "4th Set of Words",
 			"words": [
 				"or",
 				"for",
