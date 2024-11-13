@@ -34,15 +34,15 @@
 	}
 
 	.button {
-		@apply flex items-center rounded bg-gradient-to-b from-cyan-300 to-blue-300 px-6 py-3 text-xl text-blue-900 shadow-sm hover:from-cyan-200 hover:to-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-100;
+		@apply flex items-center rounded bg-gradient-to-b from-blue-200 to-blue-300 px-4 py-3 text-xl text-blue-900 shadow-sm hover:from-blue-100 hover:to-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-100;
 	}
 	.button-icononly {
 		@apply px-4;
 	}
 	.button-iconleft {
-		@apply pl-3;
+		@apply pl-2;
 	}
 	.button-iconright {
-		@apply pr-3;
+		@apply pr-2;
 	}
 }

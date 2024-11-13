@@ -336,10 +336,10 @@ const listenForWord = async () => {
 <template>
 	<div class="flex flex-col items-center pt-9">
 		<div
-			class="relative mb-9 flex h-[30vh] w-full items-center justify-center rounded-lg bg-gradient-to-b from-cyan-100 to-blue-100 text-blue-900 shadow-2xl sm:h-[50vh] sm:max-h-[500px]"
+			class="relative mb-9 flex h-[30vh] w-full items-center justify-center rounded-lg bg-white text-blue-900 shadow-2xl sm:h-[50vh] sm:max-h-[500px]"
 			role="region"
 			aria-label="Flashcard">
-			<h2 class="text-7xl font-medium drop-shadow-md md:text-9xl" aria-live="polite">{{ words[currentIndex] }}</h2>
+			<h2 class="text-7xl font-medium md:text-9xl" aria-live="polite">{{ words[currentIndex] }}</h2>
 			<div
 				v-if="feedback"
 				class="absolute bottom-3 flex items-center gap-1 rounded-full border px-4 py-2 text-lg font-semibold"

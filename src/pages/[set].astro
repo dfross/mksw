@@ -24,12 +24,12 @@ let loading = false // You can manage loading state here as needed
 <Layout PAGE_TITLE={`Set ${set} Sight Words`}>
 	<section class="text-center">
 		<h2 class="visually-hidden">{BRAND_NAME}</h2>
-		<nav class="inline-flex flex-col justify-between gap-2 sm:flex sm:flex-row">
-			<section class="flex items-center gap-2 text-xl text-blue-100">
-				<a href="/" class="flex items-center border-b-2 border-b-white/60 hover:border-b-white focus:border-b-white">
+		<nav class="inline-flex flex-col items-end justify-between gap-2 sm:flex sm:flex-row">
+			<section class="flex items-center gap-2 text-lg">
+				<a href="/" class="flex items-center border-b border-b-white/60 pr-1 hover:border-b-white focus:border-b-white">
 					<Image src="/Home.svg" alt="Return Home" height="24" width="24" class="mr-1" />Home
 				</a>
-				<Image src="/ChevronRight.svg" alt="" height="16" width="16" />
+				<Image src="/ChevronRight.svg" alt="" height="24" width="24" />
 				{set}
 			</section>
 			<select
