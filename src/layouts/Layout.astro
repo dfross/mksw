@@ -43,13 +43,11 @@ interface Props {
 		<ViewTransitions />
 	</head>
 	<body
-		class="mx-auto flex h-full max-w-screen-lg flex-col bg-[linear-gradient(rgba(23,37,84,0.8),rgba(23,37,84,0.9)),url('/bg.webp')] p-6 text-white">
-		<main class="flex h-full flex-grow flex-col justify-center">
+		class="mx-auto flex h-full max-w-screen-lg flex-col bg-[linear-gradient(rgba(23,37,84,0.8),rgba(23,37,84,0.9)),url('/bg.webp')] text-white">
+		<main class="flex h-full flex-col justify-center px-6 py-3 text-center">
 			<slot />
 		</main>
-		<footer
-			class="mx-auto w-3/4 space-y-4 text-balance pt-9 text-center text-sm font-extralight tracking-wide text-blue-100"
-			role="contentinfo">
+		<footer class="mx-auto text-balance px-6 py-3 text-center text-sm font-extralight tracking-wide text-blue-100" role="contentinfo">
 			<p>&copy; 2024 {BRAND_NAME} All rights reserved. For June ♥️.</p>
 		</footer>
 	</body>

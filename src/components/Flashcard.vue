@@ -334,9 +334,9 @@ const listenForWord = async () => {
 </script>
 
 <template>
-	<div class="flex flex-col items-center pt-9">
+	<div class="flex flex-col items-center">
 		<div
-			class="relative mb-9 flex h-[30vh] w-full items-center justify-center rounded-lg bg-white text-blue-900 shadow-2xl sm:h-[50vh] sm:max-h-[500px]"
+			class="relative my-3 flex h-[30vh] w-full items-center justify-center rounded-lg bg-white text-blue-900 shadow-2xl sm:h-[50vh] sm:max-h-[500px]"
 			role="region"
 			aria-label="Flashcard">
 			<h2 class="text-7xl font-medium md:text-9xl" aria-live="polite">{{ words[currentIndex] }}</h2>

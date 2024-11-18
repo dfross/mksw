@@ -22,27 +22,25 @@ let loading = false // You can manage loading state here as needed
 ---
 
 <Layout PAGE_TITLE={`Set ${set} Sight Words`}>
-	<section class="text-center">
-		<h2 class="visually-hidden">{BRAND_NAME}</h2>
-		<nav class="inline-flex flex-col items-end justify-between gap-2 sm:flex sm:flex-row">
-			<section class="flex items-center gap-2 text-lg">
-				<a href="/" class="flex items-center border-b border-b-white/60 pr-1 hover:border-b-white focus:border-b-white">
-					<Image src="/Home.svg" alt="Return Home" height="24" width="24" class="mr-1" />Home
-				</a>
-				<Image src="/ChevronRight.svg" alt="" height="24" width="24" />
-				{set}
-			</section>
-			<select
-				id="wordSelector"
-				aria-label="Select a sight word"
-				class="flex-shrink-0 rounded border-r-8 border-r-blue-100 bg-blue-100 px-4 py-2 text-blue-900"
-				disabled={loading}>
-				<option value="">Select a word</option>
-				{weekWords.map((word, index) => <option value={index}>{word}</option>)}
-			</select>
-		</nav>
-		<Flashcard words={weekWords} set={set} client:load />
-	</section>
+	<h2 class="visually-hidden">{BRAND_NAME}</h2>
+	<nav class="inline-flex flex-col items-end items-center justify-between gap-2 sm:flex sm:flex-row">
+		<section class="flex items-center gap-2 text-lg">
+			<a href="/" class="flex items-center border-b border-b-white/60 pr-1 hover:border-b-white focus:border-b-white">
+				<Image src="/Home.svg" alt="Return Home" height="24" width="24" class="mr-1" />Home
+			</a>
+			<Image src="/ChevronRight.svg" alt="" height="24" width="24" />
+			{set}
+		</section>
+		<select
+			id="wordSelector"
+			aria-label="Select a sight word"
+			class="flex-shrink-0 rounded border-r-8 border-r-blue-100 bg-blue-100 px-4 py-2 text-blue-900"
+			disabled={loading}>
+			<option value="">Select a word</option>
+			{weekWords.map((word, index) => <option value={index}>{word}</option>)}
+		</select>
+	</nav>
+	<Flashcard words={weekWords} set={set} client:load />
 </Layout>
 
 <script>

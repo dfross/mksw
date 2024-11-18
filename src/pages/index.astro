@@ -5,31 +5,29 @@ import { BRAND_NAME } from '../constants'
 ---
 
 <Layout PAGE_TITLE="Home">
-	<section class="space-y-9 text-center" aria-labelledby="welcome-heading">
-		<h1 aria-labelledby="welcome-heading" class="mx-auto text-balance text-4xl md:w-3/4 md:text-5xl">
-			<span class="text-3xl">Welcome to</span>
-			<span class="block font-bold leading-tight" aria-label="My Kindergarten Sight Words!">{BRAND_NAME}</span>
-		</h1>
-		<nav aria-label="Word sets">
-			<ul class="mx-auto space-y-3 md:w-1/2 md:min-w-fit" role="list">
-				{
-					words.weeks.map((week) => (
-						<Fragment key={week.set}>
-							<li>
-								<a
-									href={`/${week.set}`}
-									class="button flex min-w-full items-center justify-around gap-4 font-medium"
-									aria-label={`${week.set} - ${week.words.length} words`}>
-									<span>{week.set}</span>
-									<span class="rounded-full bg-blue-900 px-3 py-1 text-sm text-blue-100" aria-hidden="true">
-										{week.words.length} Words
-									</span>
-								</a>
-							</li>
-						</Fragment>
-					))
-				}
-			</ul>
-		</nav>
-	</section>
+	<h1 aria-labelledby="welcome-heading" class="mx-auto text-balance text-4xl md:w-3/4 md:text-5xl">
+		<span class="text-3xl">Welcome to</span>
+		<span class="block font-bold leading-tight" aria-label="My Kindergarten Sight Words!">{BRAND_NAME}</span>
+	</h1>
+	<nav aria-label="Word sets">
+		<ul class="mx-auto my-6 space-y-3 md:w-1/2 md:min-w-fit" role="list">
+			{
+				words.weeks.map((week) => (
+					<Fragment key={week.set}>
+						<li>
+							<a
+								href={`/${week.set}`}
+								class="button flex min-w-full items-center justify-around gap-4 font-medium"
+								aria-label={`${week.set} - ${week.words.length} words`}>
+								<span>{week.set}</span>
+								<span class="rounded-full bg-blue-900 px-3 py-1 text-sm text-blue-100" aria-hidden="true">
+									{week.words.length} Words
+								</span>
+							</a>
+						</li>
+					</Fragment>
+				))
+			}
+		</ul>
+	</nav>
 </Layout>
