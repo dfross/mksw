@@ -336,10 +336,10 @@ const listenForWord = async () => {
 <template>
 	<div class="flex flex-col items-center">
 		<div
-			class="relative my-3 flex h-[30vh] w-full items-center justify-center rounded-lg bg-white text-blue-900 shadow-2xl sm:h-[50vh] sm:max-h-[500px]"
+			class="relative my-3 flex h-[30vh] w-full items-center justify-center rounded-lg bg-white text-blue-900 shadow-2xl md:h-[50vh] md:max-h-[500px]"
 			role="region"
 			aria-label="Flashcard">
-			<h2 class="text-7xl font-medium md:text-9xl" aria-live="polite">{{ words[currentIndex] }}</h2>
+			<h2 class="text-7xl font-bold md:text-9xl" aria-live="polite">{{ words[currentIndex] }}</h2>
 			<div
 				v-if="feedback"
 				class="absolute bottom-3 flex items-center gap-1 rounded-full border px-4 py-2 text-lg font-semibold"
@@ -351,7 +351,7 @@ const listenForWord = async () => {
 				<alpha-x-circle-icon v-if="feedback.includes('Not quite')" :size="24" class="mr-2 text-red-700" />
 				{{ feedback }}
 			</div>
-			<small class="absolute bottom-3 right-3" aria-live="polite">{{ currentIndex + 1 }}/{{ words.length }}</small>
+			<small class="absolute bottom-3 right-3 font-normal" aria-live="polite">{{ currentIndex + 1 }}/{{ words.length }}</small>
 			<div v-if="isListening" class="absolute right-3 top-3">
 				<microphone-icon :class="{ 'animate-pulse': isListening }" />
 			</div>

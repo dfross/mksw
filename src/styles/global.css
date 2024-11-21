@@ -34,7 +34,7 @@
 	}
 
 	.button {
-		@apply flex items-center rounded bg-gradient-to-b from-blue-200 to-blue-300 px-4 py-3 text-xl text-blue-900 shadow-sm hover:from-blue-100 hover:to-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-100;
+		@apply flex items-center rounded bg-gradient-to-b from-blue-100 to-blue-200 px-4 py-3 text-xl text-blue-900 shadow-sm hover:from-blue-50 hover:to-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-100;
 	}
 	.button-icononly {
 		@apply px-4;
