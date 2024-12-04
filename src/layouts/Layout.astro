@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css'
-import { ViewTransitions } from 'astro:transitions'
+import { ClientRouter } from 'astro:transitions'
 import { AstroFont } from 'astro-font'
 import { BRAND_NAME, SITE_TITLE, SITE_DESCRIPTION } from '../constants'
 import PostHog from '../components/PostHog.astro'
@@ -42,7 +42,7 @@ interface Props {
 				},
 			]}
 		/>
-		<ViewTransitions />
+		<ClientRouter />
 	</head>
 	<body
 		class="mx-auto flex h-full max-w-screen-lg flex-col bg-[linear-gradient(rgba(23,37,84,0.88),rgba(23,37,84,0.88)),url('/bg.webp')] text-white">
