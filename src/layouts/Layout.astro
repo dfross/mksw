@@ -44,12 +44,11 @@ interface Props {
 		/>
 		<ClientRouter />
 	</head>
-	<body
-		class="mx-auto flex h-full max-w-screen-lg flex-col bg-[linear-gradient(rgba(23,37,84,0.88),rgba(23,37,84,0.88)),url('/bg.webp')] text-white">
+	<body class="mx-auto flex h-full max-w-screen-lg flex-col bg-[linear-gradient(rgba(23,37,84,0.88),rgba(23,37,84,0.88)),url('/bg.webp')]">
 		<main class="flex h-full flex-col justify-center px-6 py-3 text-center">
 			<slot />
 		</main>
-		<footer class="mx-auto text-balance px-6 py-3 text-center text-sm font-light tracking-wide text-blue-100" role="contentinfo">
+		<footer class="mx-auto px-6 py-3 text-center text-sm font-light tracking-wide text-balance text-blue-100" role="contentinfo">
 			<p>&copy; 2025 {BRAND_NAME} All rights reserved. For June ♥️.</p>
 		</footer>
 	</body>
