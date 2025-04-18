@@ -19,7 +19,7 @@
 		"@tailwindcss/vite": "^4.1.4",
 		"@types/node": "^22.14.1",
 		"add": "^2.0.6",
-		"astro": "^5.7.2",
+		"astro": "^5.7.4",
 		"astro-compressor": "^1.0.0",
 		"astro-font": "^1.1.0",
 		"astro-icon": "^1.1.5",
