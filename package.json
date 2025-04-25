@@ -17,7 +17,7 @@
 		"@playform/compress": "^0.1.9",
 		"@playform/inline": "^0.1.2",
 		"@tailwindcss/vite": "^4.1.4",
-		"@types/node": "^22.14.1",
+		"@types/node": "^22.15.2",
 		"add": "^2.0.6",
 		"astro": "^5.7.5",
 		"astro-compressor": "^1.0.0",
