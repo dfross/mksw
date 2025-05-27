@@ -13,13 +13,13 @@
 		"@astrojs/check": "^0.9.4",
 		"@astrojs/partytown": "^2.1.4",
 		"@astrojs/sitemap": "^3.4.0",
-		"@astrojs/vue": "^5.0.13",
+		"@astrojs/vue": "^5.1.0",
 		"@playform/compress": "^0.1.9",
 		"@playform/inline": "^0.1.2",
 		"@tailwindcss/vite": "^4.1.7",
-		"@types/node": "^22.15.19",
+		"@types/node": "^22.15.21",
 		"add": "^2.0.6",
-		"astro": "^5.7.13",
+		"astro": "^5.8.0",
 		"astro-compressor": "^1.0.0",
 		"astro-font": "^1.1.0",
 		"astro-icon": "^1.1.5",
@@ -29,7 +29,7 @@
 		"prettier-plugin-tailwindcss": "^0.6.11",
 		"tailwindcss": "^4.1.7",
 		"typescript": "^5.8.3",
-		"vue": "^3.5.14",
+		"vue": "^3.5.15",
 		"vue-material-design-icons": "^5.3.1"
 	}
 }
