@@ -45,12 +45,16 @@ interface Props {
 		<ClientRouter />
 	</head>
 	<body class="mx-auto flex h-full max-w-screen-lg flex-col bg-[linear-gradient(rgba(23,37,84,0.88),rgba(23,37,84,0.88)),url('/bg.webp')]">
-		<a href="#main-content" class="visually-hidden focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded focus:bg-white focus:px-4 focus:py-2 focus:text-blue-900">Skip to main content</a>
+		<a
+			href="#main-content"
+			class="visually-hidden focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded focus:bg-white focus:px-4 focus:py-2 focus:text-blue-900">
+			Skip to main content
+		</a>
 		<main id="main-content" class="flex h-full flex-col justify-center px-6 py-3 text-center">
 			<slot />
 		</main>
 		<footer class="mx-auto px-6 py-3 text-center text-sm font-light tracking-wide text-balance text-blue-100" role="contentinfo">
-			<p>&copy; 2025 {BRAND_NAME} All rights reserved. For June ♥️.</p>
+			<p>&copy; {new Date().getFullYear()} {BRAND_NAME} All rights reserved. For June ♥️.</p>
 		</footer>
 	</body>
 </html>
