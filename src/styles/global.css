@@ -11,7 +11,6 @@
 	}
 
 	.visually-hidden {
-		position: absolute;
 		position: absolute !important;
 		width: 1px !important;
 		height: 1px !important;
@@ -33,6 +32,12 @@
 
 	.button {
 		@apply flex items-center rounded bg-gradient-to-b from-blue-100 to-blue-200 px-4 py-3 text-xl text-blue-900 shadow-sm hover:from-blue-50 hover:to-blue-100 focus:ring-2 focus:ring-blue-100 focus:outline-none;
+	}
+	.button:disabled {
+		@apply cursor-not-allowed opacity-50;
+	}
+	.button-icon {
+		@apply min-h-11 min-w-11 justify-center;
 	}
 	.button-icononly {
 		@apply px-4;

@@ -22,19 +22,23 @@ let loading = false // You can manage loading state here as needed
 ---
 
 <Layout PAGE_TITLE={`Set ${set} Sight Words`}>
-	<h2 class="visually-hidden">{BRAND_NAME}</h2>
-	<nav class="inline-flex flex-col items-center justify-between gap-2 text-white sm:flex sm:flex-row sm:items-end">
-		<section class="flex items-center gap-2 text-lg">
-			<a href="/" class="flex items-center border-b border-b-white hover:border-b-blue-100 hover:text-blue-100 focus:border-b-blue-100">
-				<Image src="/Home.svg" alt="Return Home" height="24" width="24" class="mr-1" />Home
-			</a>
-			<Image src="/ChevronRight.svg" alt="" height="24" width="24" />
-			{set}
-		</section>
+	<h1 class="visually-hidden">{BRAND_NAME}</h1>
+	<nav class="inline-flex flex-col items-center justify-between gap-2 text-white sm:flex sm:flex-row sm:items-end" aria-label="Breadcrumb">
+		<ol class="flex items-center gap-2 text-lg">
+			<li>
+				<a href="/" class="flex items-center border-b border-b-white hover:border-b-blue-100 hover:text-blue-100 focus:border-b-blue-100">
+					<Image src="/Home.svg" alt="" height="24" width="24" class="mr-1" aria-hidden="true" />Home
+				</a>
+			</li>
+			<li class="flex items-center gap-2" aria-current="page">
+				<Image src="/ChevronRight.svg" alt="" height="24" width="24" aria-hidden="true" />
+				{set}
+			</li>
+		</ol>
 		<select
 			id="wordSelector"
 			aria-label="Select a sight word"
-			class="flex-shrink-0 rounded border-r-8 border-r-blue-100 bg-blue-100 px-4 py-2 text-blue-900"
+			class="shrink-0 rounded border-r-8 border-r-blue-100 bg-blue-100 px-4 py-2 text-blue-900"
 			disabled={loading}>
 			<option value="">Select a word</option>
 			{weekWords.map((word, index) => <option value={index}>{word}</option>)}

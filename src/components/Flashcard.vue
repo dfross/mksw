@@ -29,9 +29,10 @@ const microphoneAvailable = ref(false)
 const feedback = ref('')
 
 let recognition
-let microphoneStream = null
 let cleanupInterval
 let listenTimeout
+let voices = []
+const selectedVoice = ref(null)
 
 const checkMicrophonePermissions = async () => {
 	try {
@@ -103,29 +104,7 @@ const initializeSpeechRecognition = () => {
 const forceStopAudio = () => {
 	console.log('Force stopping all audio')
 
-	// Stop all audio contexts
-	if (window.AudioContext || window.webkitAudioContext) {
-		const AudioContext = window.AudioContext || window.webkitAudioContext
-		const audioContexts = []
-		while (AudioContext.getContexts && AudioContext.getContexts().length) {
-			audioContexts.push(AudioContext.getContexts()[0])
-		}
-		audioContexts.forEach((ctx) => {
-			if (ctx.state !== 'closed') {
-				ctx.close()
-			}
-		})
-	}
-
-	// Stop all audio tracks
-	if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-		navigator.mediaDevices
-			.getUserMedia({ audio: true })
-			.then((stream) => {
-				stream.getTracks().forEach((track) => track.stop())
-			})
-			.catch((err) => console.error('Error accessing media devices.', err))
-	}
+	window.speechSynthesis.cancel()
 
 	// Stop speech recognition if it's running
 	if (recognition) {
@@ -134,7 +113,6 @@ const forceStopAudio = () => {
 
 	// Reset state
 	isListening.value = false
-	microphoneStream = null
 }
 
 const cleanup = () => {
@@ -184,6 +162,22 @@ onMounted(async () => {
 	checkMicrophonePermissions() // Check permissions
 
 	initializeSpeechRecognition()
+
+	// Initialize voices
+	const loadVoices = () => {
+		voices = window.speechSynthesis.getVoices()
+		// Try to find a good English voice
+		selectedVoice.value =
+			voices.find((v) => v.name.includes('Google US English')) ||
+			voices.find((v) => v.lang === 'en-US' && v.localService) ||
+			voices.find((v) => v.lang.startsWith('en')) ||
+			null
+	}
+
+	loadVoices()
+	if (window.speechSynthesis.onvoiceschanged !== undefined) {
+		window.speechSynthesis.onvoiceschanged = loadVoices
+	}
 
 	window.addEventListener('keydown', handleKeydown)
 	window.addEventListener('setFlashcardWord', handleSetFlashcardWord)
@@ -264,12 +258,15 @@ const speakWord = () => {
 
 	isSpeaking.value = true
 	const utterance = new SpeechSynthesisUtterance(wordToSpeak)
+	if (selectedVoice.value) {
+		utterance.voice = selectedVoice.value
+	}
 
 	utterance.rate = 0.8 // Slightly slower rate for clearer pronunciation
 	utterance.pitch = 1 // Normal pitch
 
 	if (wordToSpeak.length === 1 && wordToSpeak.toLowerCase() === 'i') {
-		utterance.text = `- ${wordToSpeak}`
+		utterance.text = ` ${wordToSpeak}` // Add leading space to help with "I" pronunciation
 	} else {
 		utterance.text = wordToSpeak
 	}
@@ -289,12 +286,6 @@ const speakWord = () => {
 
 const stopMicrophone = () => {
 	console.log('Stopping microphone')
-	if (microphoneStream) {
-		microphoneStream.getTracks().forEach((track) => {
-			track.stop()
-		})
-		microphoneStream = null
-	}
 	isListening.value = false
 }
 
@@ -308,13 +299,6 @@ const listenForWord = async () => {
 	try {
 		// Force stop any existing audio before starting new
 		forceStopAudio()
-
-		// Create a new audio context
-		const AudioContext = window.AudioContext || window.webkitAudioContext
-		const audioContext = new AudioContext()
-
-		const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-		microphoneStream = stream
 
 		feedback.value = ''
 		isListening.value = true
