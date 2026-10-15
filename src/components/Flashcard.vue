@@ -326,6 +326,7 @@ const listenForWord = async () => {
 			<h2 class="text-7xl font-bold md:text-9xl" aria-live="polite">{{ words[currentIndex] }}</h2>
 			<div
 				v-if="feedback"
+				role="status"
 				class="absolute bottom-3 flex items-center gap-1 rounded-full border px-4 py-2 text-lg font-semibold"
 				:class="{
 					'border-green-300 bg-green-100 text-green-700': feedback.includes('Correct'),
@@ -336,30 +337,30 @@ const listenForWord = async () => {
 				{{ feedback }}
 			</div>
 			<small class="absolute right-3 bottom-3 font-normal" aria-live="polite">{{ currentIndex + 1 }}/{{ words.length }}</small>
-			<div v-if="isListening" class="absolute top-3 right-3">
+			<div v-if="isListening" role="status" aria-label="Listening" title="Listening for word..." class="absolute top-3 right-3">
 				<microphone-icon :class="{ 'animate-pulse': isListening }" />
 			</div>
 		</div>
 
 		<div class="flex w-full flex-col items-center justify-between gap-2 sm:flex-row">
 			<div class="flex gap-2">
-				<button class="button button-iconleft" @click="previousWord" :disabled="currentIndex === 0" aria-label="Previous word">
+				<button class="button button-iconleft" @click="previousWord" :disabled="currentIndex === 0" aria-label="Previous word" :title="currentIndex === 0 ? 'First word' : 'Previous word'">
 					<chevron-left-icon />
 					Prev
 				</button>
-				<button class="button button-icon" @click="selectRandomWord" aria-label="Random word">
+				<button class="button button-icon" @click="selectRandomWord" aria-label="Random word" title="Random word">
 					<shuffle-icon />
 				</button>
-				<button class="button button-iconright" @click="nextWord" :disabled="currentIndex === words.length - 1" aria-label="Next word">
+				<button class="button button-iconright" @click="nextWord" :disabled="currentIndex === words.length - 1" aria-label="Next word" :title="currentIndex === words.length - 1 ? 'Last word' : 'Next word'">
 					Next
 					<chevron-right-icon />
 				</button>
 			</div>
 			<div class="flex gap-2">
-				<button class="button button-icon" @click="speakWord" :disabled="!speechSupported" aria-label="Speak word">
+				<button class="button button-icon" @click="speakWord" :disabled="!speechSupported" aria-label="Speak word" :title="!speechSupported ? 'Speech synthesis not supported' : 'Speak word'">
 					<ear-hearing-icon />
 				</button>
-				<button class="button button-icon" @click="listenForWord" :disabled="!microphoneAvailable" aria-label="Listen for word">
+				<button class="button button-icon" @click="listenForWord" :disabled="!microphoneAvailable" aria-label="Listen for word" :title="!microphoneAvailable ? 'Microphone access required' : 'Listen for word'">
 					<microphone-icon />
 				</button>
 			</div>
