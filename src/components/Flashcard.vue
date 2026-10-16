@@ -31,7 +31,6 @@ const feedback = ref('')
 let recognition
 let cleanupInterval
 let listenTimeout
-let voices = []
 const selectedVoice = ref(null)
 
 const checkMicrophonePermissions = async () => {
@@ -165,7 +164,7 @@ onMounted(async () => {
 
 	// Initialize voices
 	const loadVoices = () => {
-		voices = window.speechSynthesis.getVoices()
+		const voices = window.speechSynthesis.getVoices()
 		// Try to find a good English voice
 		selectedVoice.value =
 			voices.find((v) => v.name.includes('Google US English')) ||
