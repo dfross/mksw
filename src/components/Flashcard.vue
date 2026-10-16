@@ -29,7 +29,6 @@ const microphoneAvailable = ref(false)
 const feedback = ref('')
 
 let recognition
-let cleanupInterval
 let listenTimeout
 let voices = []
 const selectedVoice = ref(null)
@@ -185,12 +184,6 @@ onMounted(async () => {
 	window.addEventListener('blur', handleWindowBlur)
 	window.addEventListener('pagehide', handlePageHide)
 	window.addEventListener('beforeunload', handleBeforeUnload)
-
-	cleanupInterval = setInterval(() => {
-		if (!document.hasFocus()) {
-			cleanup()
-		}
-	}, 1000) // Check every second
 })
 
 onUnmounted(() => {
@@ -200,7 +193,6 @@ onUnmounted(() => {
 	window.removeEventListener('blur', handleWindowBlur)
 	window.removeEventListener('pagehide', handlePageHide)
 	window.removeEventListener('beforeunload', handleBeforeUnload)
-	clearInterval(cleanupInterval)
 	cleanup()
 })
 
