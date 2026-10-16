@@ -111,7 +111,7 @@ describe('Flashcard.vue', () => {
 
     // Clear the error message that comes from getUserMedia mock failing if we didn't mock it perfectly,
     // we want to test speak error not mic error. We can just set feedback to empty string first manually.
-    wrapper.vm.feedback = ''
+    ;(wrapper.vm as any).feedback = ''
     await wrapper.vm.$nextTick()
 
     expect(wrapper.find('[role="status"]').exists()).toBe(false)
@@ -120,7 +120,7 @@ describe('Flashcard.vue', () => {
 
     mockSpeak.mockImplementation((utterance: SpeechSynthesisUtterance) => {
       if (utterance.onerror) {
-        utterance.onerror(new Event('error'))
+        utterance.onerror(new Event('error') as any)
       }
     })
 
