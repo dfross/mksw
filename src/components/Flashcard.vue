@@ -165,17 +165,19 @@ onMounted(async () => {
 
 	// Initialize voices
 	const loadVoices = () => {
-		voices = window.speechSynthesis.getVoices()
-		// Try to find a good English voice
-		selectedVoice.value =
-			voices.find((v) => v.name.includes('Google US English')) ||
-			voices.find((v) => v.lang === 'en-US' && v.localService) ||
-			voices.find((v) => v.lang.startsWith('en')) ||
-			null
+		if (window.speechSynthesis) {
+			voices = window.speechSynthesis.getVoices()
+			// Try to find a good English voice
+			selectedVoice.value =
+				voices.find((v) => v.name.includes('Google US English')) ||
+				voices.find((v) => v.lang === 'en-US' && v.localService) ||
+				voices.find((v) => v.lang.startsWith('en')) ||
+				null
+		}
 	}
 
 	loadVoices()
-	if (window.speechSynthesis.onvoiceschanged !== undefined) {
+	if (window.speechSynthesis && window.speechSynthesis.onvoiceschanged !== undefined) {
 		window.speechSynthesis.onvoiceschanged = loadVoices
 	}
 
