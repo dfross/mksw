@@ -1,8 +1,9 @@
 ---
 // src/components/posthog.astro
+const posthogApiKey = import.meta.env.PUBLIC_POSTHOG_API_KEY || 'MISSING_POSTHOG_API_KEY';
 ---
 
-<script is:inline>
+<script is:inline define:vars={{ posthogApiKey }}>
 	!(function (t, e) {
 		var o, n, p, r
 		e.__SV ||
@@ -44,7 +45,7 @@
 			}),
 			(e.__SV = 1))
 	})(document, window.posthog || [])
-	posthog.init('phc_sdl7NgxTsrLZctC3PCBWyoWj1KDDTiRD51qh5g8lScW', {
+	posthog.init(posthogApiKey, {
 		api_host: 'https://us.i.posthog.com',
 		person_profiles: 'identified_only',
 	})
